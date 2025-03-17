@@ -33,7 +33,7 @@ measurement_J = sp.lambdify(x, sp_measurement.jacobian(x))
 def transition_noise() -> np.ndarray:
     noise = np.empty(4)
     for i in range(4):
-        noise[i] = np.random.normal(0, Q[i, i])
+        noise[i] = np.random.normal(0, Q[i, i] ** 0.5)
     return noise
 
 
@@ -41,5 +41,5 @@ def transition_noise() -> np.ndarray:
 def measurement_noise() -> np.ndarray:
     noise = np.empty(2)
     for i in range(2):
-        noise[i] = np.random.normal(0, R[i, i])
+        noise[i] = np.random.normal(0, R[i, i] ** 0.5)
     return noise
