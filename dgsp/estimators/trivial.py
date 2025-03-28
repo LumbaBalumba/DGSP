@@ -2,7 +2,7 @@ from typing_extensions import override
 
 import numpy as np
 
-from dgsp.estimators import Estimator
+from dgsp.estimators.base import Estimator
 
 
 class TrivialEstimator(Estimator):
@@ -23,6 +23,6 @@ class TrivialEstimator(Estimator):
     @override
     def predict_step(self) -> None:
         idx = int(np.ceil(self.time / self.dt))
-        self.state = self.traj[idx, :]
-        self.k = self.std[idx, :]
+        self.state.append(self.traj[idx, :])
+        self.k.append(self.std[idx, :])
         super().predict_step()
