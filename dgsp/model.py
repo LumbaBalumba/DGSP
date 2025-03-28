@@ -13,19 +13,15 @@ class RobotSystem:
         self.trajectory = np.random.normal(np.zeros(4), 0.3 * np.ones(4)).reshape(
             (-1, 4)
         )
-        self.measurements = measurement(*self.trajectory[0]).reshape((-1, 2))
+        self.measurements = measurement(self.trajectory[0]).reshape((-1, 2))
         self.time = 0.0
         self.dt = dt
         self.t_max = t_max
 
     def step(self) -> None:
         old_state = self.trajectory[-1]
-        new_state = (
-            old_state
-            + transition(*old_state).reshape((-1)) * self.dt
-            + transition_noise()
-        )
-        new_measurement = measurement(*new_state).reshape((-1)) + measurement_noise()
+        new_state = old_state + transition(old_state) * self.dt + transition_noise()
+        new_measurement = measurement(new_state) + measurement_noise()
         self.trajectory = np.append(self.trajectory, [new_state], axis=0)
         self.measurements = np.append(self.measurements, [new_measurement], axis=0)
         self.time += self.dt
