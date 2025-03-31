@@ -3,11 +3,10 @@ import os
 from joblib import Parallel, delayed
 
 import dgsp.model as model
+from scripts import dt_sim, T_MAX
 
 
 NUM_TRAJECTORIES = 10000
-T_MAX = 10.0
-dt = 0.0025
 
 if not os.path.exists("data/traj"):
     os.makedirs("data/traj")
@@ -17,7 +16,7 @@ if not os.path.exists("data/meas"):
 
 
 def generate_one(idx: int):
-    system = model.RobotSystem(dt=dt, t_max=T_MAX)
+    system = model.RobotSystem(dt=dt_sim, t_max=T_MAX)
     system.simulate()
     traj_filename = os.path.join("data", "traj", f"{idx}.npy")
     meas_filename = os.path.join("data", "meas", f"{idx}.npy")
