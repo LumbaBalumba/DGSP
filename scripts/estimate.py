@@ -60,5 +60,7 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
 
 
 def estimate(parallel: bool = True) -> None:
-    for estimator_type in ["UKF", "trivial"]:
+    # types = ["UKF", "UKFR", "PF", "trivial"]
+    types = ["UKF", "trivial"]
+    for estimator_type in types:
         estimate_all(estimator_type, parallel)
