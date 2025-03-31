@@ -8,7 +8,7 @@ x = sp.Matrix([x1, x2, theta, phi])
 
 
 l = 0.1
-Q = np.diag([3e-1, 3e-1, 3e-1, 3e-1])
+Q = np.diag([3e-3, 3e-3, 3e-1, 3e-1])
 R = np.eye(2) * 0.2
 u1 = 3.0
 u2 = 3.0
