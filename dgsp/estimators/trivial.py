@@ -23,5 +23,5 @@ class TrivialEstimator(Estimator):
     def predict_step(self) -> None:
         idx = int(self.time / self.dt)
         self.state.append(self.traj[idx, :])
-        self.k.append(self.std[idx, :])
+        self.k.append(np.diag(self.std[idx, :]))
         super().predict_step()
