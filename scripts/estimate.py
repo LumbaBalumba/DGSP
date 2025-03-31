@@ -1,6 +1,6 @@
 from copy import deepcopy
 import os
-from typing import Literal
+
 import numpy as np
 
 from dgsp.estimators.base import Estimator
