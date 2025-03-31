@@ -38,7 +38,6 @@ class UnscentedKalmanFilter(Estimator):
         for i in range(1, n_points + 1):
             points[i] = points[0] + L[:, i - 1]
 
-        L = np.linalg.cholesky(k * n_points / (1 - w[0]))
         for i in range(n_points + 1, 2 * n_points + 1):
             points[i] = points[0] - L[:, i - n_points - 1]
 
@@ -46,12 +45,17 @@ class UnscentedKalmanFilter(Estimator):
 
     @override
     def predict_step(self) -> None:
-        points, w = self.sigma_points(self.n_points, self.state[-1], self.k[-1])
+        state = self.state[-1]
+        k = self.k[-1]
+        points, w = self.sigma_points(self.n_points, state, k)
         state_est = np.average(
-            [transition(point) for point in points], axis=0, weights=w
+            [transition(point) * self.dt + state for point in points], axis=0, weights=w
         ).reshape((-1))
         k_est = np.average(
-            [square(transition(point) - state_est) for point in points],
+            [
+                square(transition(point) * self.dt + state - state_est)
+                for point in points
+            ],
             axis=0,
             weights=w,
         ).reshape((4, 4)) + square(np.array(Q.diagonal()))

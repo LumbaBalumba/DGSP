@@ -8,7 +8,7 @@ x = sp.Matrix([x1, x2, theta, phi])
 
 
 l = 0.1
-Q = np.diag([1e-4, 1e-4, 0.3, 0.3])
+Q = np.diag([3e-1, 3e-1, 3e-1, 3e-1])
 R = np.eye(2) * 0.2
 u1 = 3.0
 u2 = 3.0
@@ -25,7 +25,7 @@ transition_c = numba.jit(nopython=True)(sp.lambdify(x, sp_transition))
 transition = lambda x: transition_c(*x).reshape((-1))
 transition_J = sp.lambdify(x, sp_transition.jacobian(x))
 
-sp_measurement = sp.Matrix([(x1**2 + x2**2) ** 0.5, sp.atan(x2 / x1)])
+sp_measurement = sp.Matrix([(x1**2 + x2**2) ** 0.5, sp.atan2(x2, x1)])
 measurement_c = numba.jit(nopython=True)(sp.lambdify(x, sp_measurement))
 measurement = lambda x: measurement_c(*x).reshape((-1))
 measurement_J = sp.lambdify(x, sp_measurement.jacobian(x))
