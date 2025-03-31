@@ -15,7 +15,7 @@ if not os.path.exists("data/meas"):
     os.makedirs("data/meas")
 
 
-def generate_one(idx: int):
+def generate_one(idx: int) -> None:
     system = model.RobotSystem(dt=dt_sim, t_max=T_MAX)
     system.simulate()
     traj_filename = os.path.join("data", "traj", f"{idx}.npy")
@@ -23,7 +23,7 @@ def generate_one(idx: int):
     system.save(traj_filename, meas_filename)
 
 
-def generate_all(parallel=True):
+def generate_all(parallel: bool = True) -> None:
     if parallel:
         Parallel(n_jobs=-1, verbose=10)(
             delayed(generate_one)(i) for i in range(NUM_TRAJECTORIES)

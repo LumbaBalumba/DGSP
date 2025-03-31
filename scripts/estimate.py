@@ -1,6 +1,7 @@
 from copy import deepcopy
 import os
 
+from joblib import Parallel, delayed
 import numpy as np
 
 from dgsp.estimators.base import Estimator
@@ -36,7 +37,7 @@ def estimate_one(traj_n: int, estimator: Estimator) -> None:
         np.save(os.path.join(new_path_k, f"{traj_n}.npy"), k_est)
 
 
-def estimate_all(estimator_type: str) -> None:
+def estimate_all(estimator_type: str, parallel: bool = True) -> None:
     match estimator_type:
         case "UKF":
             estimator = UnscentedKalmanFilter(dt_pred)
@@ -48,10 +49,16 @@ def estimate_all(estimator_type: str) -> None:
         case _:
             raise RuntimeError(f"Invalid estimator type: {estimator_type}")
 
-    for idx in range(NUM_TRAJECTORIES):
-        estimate_one(idx, deepcopy(estimator))
+    if parallel:
+        Parallel(n_jobs=-1, verbose=10)(
+            delayed(estimate_one)(idx, deepcopy(estimator))
+            for idx in range(NUM_TRAJECTORIES)
+        )
+    else:
+        for idx in range(NUM_TRAJECTORIES):
+            estimate_one(idx, deepcopy(estimator))
 
 
-def estimate():
-    for estimator_type in ["UKF", "UKFR", "PF", "trivial"]:
-        estimate_all(estimator_type)
+def estimate(parallel: bool = True) -> None:
+    for estimator_type in ["UKF", "trivial"]:
+        estimate_all(estimator_type, parallel)
