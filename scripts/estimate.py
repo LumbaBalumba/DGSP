@@ -13,17 +13,14 @@ from scripts.generate import NUM_TRAJECTORIES
 
 def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
     meas = np.load(f"data/meas/{traj_n}.npy")
-    traj_init = np.load(f"data/traj/{traj_n}.npy")[0, :]
-
-    estimator.state[0] = traj_init
 
     pred_step = int(dt_pred / dt_sim)
     correct_step = int(dt_meas / dt_sim)
 
     for i in range(0, len(meas), pred_step):
-        estimator.predict_step()
+        estimator.predict()
         if i % correct_step == 0:
-            estimator.correct_step(meas[i])
+            estimator.update(meas[i])
 
     traj_est, k_est = estimator.state, estimator.k
 

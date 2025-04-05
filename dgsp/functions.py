@@ -13,6 +13,9 @@ R = np.eye(2) * 0.01
 u1 = 3.0
 u2 = 1e-1 / 20 * 0
 
+initial = np.array([20.0, 20.0, 0.0, 0.0])
+
+
 sp_transition = sp.Matrix(
     [
         sp.cos(theta) * sp.cos(phi) * u1,
@@ -22,12 +25,12 @@ sp_transition = sp.Matrix(
     ]
 )
 transition_c = numba.njit()(sp.lambdify(x, sp_transition))
-transition = lambda x: transition_c(*x).reshape((-1))
+transition = lambda x: transition_c(x[0], x[1], x[2], x[3]).reshape((-1))
 transition_J = sp.lambdify(x, sp_transition.jacobian(x))
 
 sp_measurement = sp.Matrix([(x1**2 + x2**2) ** 0.5, sp.atan2(x2, x1)])
 measurement_c = numba.njit()(sp.lambdify(x, sp_measurement))
-measurement = lambda x: measurement_c(*x).reshape((-1))
+measurement = lambda x: measurement_c(x[0], x[1], x[2], x[3]).reshape((-1))
 measurement_J = sp.lambdify(x, sp_measurement.jacobian(x))
 
 

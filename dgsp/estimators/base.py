@@ -1,5 +1,7 @@
 import numpy as np
 
+from dgsp.functions import initial, Q
+
 
 class Estimator:
     dt: float
@@ -10,16 +12,14 @@ class Estimator:
     def __init__(
         self,
         dt: float,
-        state: np.ndarray,
-        k: np.ndarray,
     ) -> None:
         self.dt = dt
-        self.state = [state]
-        self.k = [k]
+        self.state = [initial]
+        self.k = [Q]
         self.time = 0.0
 
-    def predict_step(self) -> None:
+    def predict(self) -> None:
         self.time += self.dt
 
-    def correct_step(self, data: np.ndarray) -> None:
+    def update(self, data: np.ndarray) -> None:
         self.time += self.dt

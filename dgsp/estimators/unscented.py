@@ -1,108 +1,50 @@
-from numba import numba
 from typing_extensions import override
 
 import numpy as np
+from filterpy.kalman import UnscentedKalmanFilter as UKF, MerweScaledSigmaPoints
 
 from dgsp.estimators.base import Estimator
-from dgsp.functions import Q, R, transition, measurement
-
-
-@numba.njit
-def square(x: np.ndarray) -> np.ndarray:
-    return x.reshape((-1, 1)) @ x.reshape((-1, 1)).T
-
-
-@numba.njit
-def fix(x: np.ndarray) -> np.ndarray:
-    if not np.all(np.linalg.eigvals(x) > 0):
-        x += np.eye(len(x)) * 1e-7
-    return x
+from dgsp.functions import Q, R, transition, measurement, initial
 
 
 class UnscentedKalmanFilter(Estimator):
-    n_points: int
+    kf: UKF
 
     def __init__(
         self,
         dt: float,
     ) -> None:
-        super().__init__(dt, np.zeros(4), Q)
-        self.n_points = 4
+        super().__init__(dt)
 
-    @staticmethod
-    def sigma_points(
-        n_points: int, state: np.ndarray, k: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
-        w = np.zeros(2 * n_points + 1)
-        points = np.zeros((2 * n_points + 1, 4))
+        def fx(x: np.ndarray, dt: float) -> np.ndarray:
+            return transition(x) * dt + x
 
-        w[0] = 0.5
-        w[1:] = (1 - w[0]) / (2 * n_points)
+        def hx(x: np.ndarray) -> np.ndarray:
+            return measurement(x)
 
-        points[0] = state
+        points = MerweScaledSigmaPoints(4, alpha=0.1, beta=2.0, kappa=-1.0)
 
-        A = k * n_points / (1 - w[0])
+        self.kf = UKF(dt=self.dt, dim_x=4, dim_z=2, fx=fx, hx=hx, points=points)
+        self.kf.x = initial
+        self.kf.P *= 0.2
 
-        L = np.linalg.cholesky(A)
-
-        for i in range(1, n_points + 1):
-            points[i] = points[0] + L[:, i - 1]
-
-        for i in range(n_points + 1, 2 * n_points + 1):
-            points[i] = points[0] - L[:, i - n_points - 1]
-
-        return points, w
+        self.kf.Q = Q
+        self.kf.R = R
 
     @override
-    def predict_step(self) -> None:
-        self.k[-1] = fix(self.k[-1])
+    def predict(self) -> None:
+        self.kf.predict()
 
-        state = self.state[-1]
-        k = self.k[-1]
+        self.state.append(self.kf.x)
+        self.k.append(self.kf.P)
 
-        points, w = self.sigma_points(self.n_points, state, k)
-        state_est = np.average(
-            [transition(point) * self.dt + state for point in points], axis=0, weights=w
-        ).reshape((-1))
-        k_est = np.average(
-            [
-                square(transition(point) * self.dt + state - state_est)
-                for point in points
-            ],
-            axis=0,
-            weights=w,
-        ).reshape((4, 4)) + square(np.array(Q.diagonal()))
-        self.state.append(state_est)
-        self.k.append(k_est)
-        return super().predict_step()
+        return super().predict()
 
     @override
-    def correct_step(self, data: np.ndarray) -> None:
-        self.k[-1] = fix(self.k[-1])
-        points, w = self.sigma_points(self.n_points, self.state[-1], self.k[-1])
-        measurement_est = np.average(
-            [measurement(point) for point in points], axis=0, weights=w
-        ).reshape((-1))
+    def update(self, data: np.ndarray) -> None:
+        self.kf.update(data)
 
-        kappa = np.average(
-            [square(measurement(point) - measurement_est) for point in points],
-            axis=0,
-            weights=w,
-        ).reshape((2, 2)) + square(np.array(R.diagonal()))
+        self.state[-1] = self.kf.x
+        self.k[-1] = self.kf.P
 
-        mu = np.average(
-            [
-                (point - self.state[-1]).reshape((-1, 1))
-                @ (measurement(point) - measurement_est).reshape((-1, 1)).T
-                for point in points
-            ],
-            axis=0,
-            weights=w,
-        ).reshape((4, 2))
-
-        kappa_inv = np.linalg.inv(kappa)
-
-        self.state[-1] += mu @ kappa_inv @ (data - measurement_est)
-        self.k[-1] -= mu @ kappa_inv @ mu.T
-
-        return super().correct_step(data)
+        return super().update(data)

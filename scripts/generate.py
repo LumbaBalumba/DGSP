@@ -7,7 +7,7 @@ import dgsp.model as model
 from scripts import dt_sim, T_MAX
 
 
-NUM_TRAJECTORIES = 1
+NUM_TRAJECTORIES = 10000
 
 np.random.seed(100)
 

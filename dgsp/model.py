@@ -1,6 +1,12 @@
 import numpy as np
 
-from dgsp.functions import transition, transition_noise, measurement, measurement_noise
+from dgsp.functions import (
+    transition,
+    transition_noise,
+    measurement,
+    measurement_noise,
+    initial,
+)
 
 
 class RobotSystem:
@@ -8,11 +14,10 @@ class RobotSystem:
     time: float
     dt: float
     t_max: float
+    init: np.ndarray = np.array(initial, dtype=float)
 
     def __init__(self, dt: float, t_max: float) -> None:
-        self.trajectory = np.random.normal(np.zeros(4), 0.3 * np.ones(4)).reshape(
-            (-1, 4)
-        )
+        self.trajectory = np.random.normal(self.init, 0.3 * np.ones(4)).reshape((-1, 4))
         self.measurements = measurement(self.trajectory[0]).reshape((-1, 2))
         self.time = 0.0
         self.dt = dt
