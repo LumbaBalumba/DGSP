@@ -41,6 +41,8 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
     match estimator_type:
         case "ukf":
             estimator = UnscentedKalmanFilter(dt_pred)
+        case "ukfr":
+            estimator = UnscentedKalmanFilter(dt_pred, square_root=True)
         case "trivial":
             all_traj = [np.load(f"data/traj/{i}.npy") for i in range(NUM_TRAJECTORIES)]
             estimator = TrivialEstimator(dt_pred, np.array(all_traj))

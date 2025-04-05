@@ -10,10 +10,7 @@ from dgsp.functions import Q, R, transition, measurement, initial
 class UnscentedKalmanFilter(Estimator):
     kf: UKF
 
-    def __init__(
-        self,
-        dt: float,
-    ) -> None:
+    def __init__(self, dt: float, square_root: bool = False) -> None:
         super().__init__(dt)
 
         def fx(x: np.ndarray, dt: float) -> np.ndarray:
