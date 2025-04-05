@@ -1,5 +1,5 @@
-T_MAX = 10.0
+T_MAX = 1e1
 
-dt_sim = T_MAX / 4e3
-dt_pred = T_MAX / 4e2
-dt_meas = dt_pred  # T_MAX / 4e1
+dt_sim = T_MAX / 1e3
+dt_pred = dt_sim
+dt_meas = dt_pred * 10

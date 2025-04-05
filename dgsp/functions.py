@@ -8,10 +8,10 @@ x = sp.Matrix([x1, x2, theta, phi])
 
 
 l = 0.1
-Q = np.diag([3e-3, 3e-3, 3e-1, 3e-1])
-R = np.eye(2) * 0.2
+Q = np.diag([3e-3, 3e-3, 3e-1, 3e-1]) / 1e4
+R = np.eye(2) * 0.01
 u1 = 3.0
-u2 = 3.0
+u2 = 1e-1 / 20 * 0
 
 sp_transition = sp.Matrix(
     [

@@ -12,6 +12,13 @@ def square(x: np.ndarray) -> np.ndarray:
     return x.reshape((-1, 1)) @ x.reshape((-1, 1)).T
 
 
+@numba.njit
+def fix(x: np.ndarray) -> np.ndarray:
+    if not np.all(np.linalg.eigvals(x) > 0):
+        x += np.eye(len(x)) * 1e-7
+    return x
+
+
 class UnscentedKalmanFilter(Estimator):
     n_points: int
 
@@ -34,7 +41,10 @@ class UnscentedKalmanFilter(Estimator):
 
         points[0] = state
 
-        L = np.linalg.cholesky(k * n_points / (1 - w[0]))
+        A = k * n_points / (1 - w[0])
+
+        L = np.linalg.cholesky(A)
+
         for i in range(1, n_points + 1):
             points[i] = points[0] + L[:, i - 1]
 
@@ -45,8 +55,11 @@ class UnscentedKalmanFilter(Estimator):
 
     @override
     def predict_step(self) -> None:
+        self.k[-1] = fix(self.k[-1])
+
         state = self.state[-1]
         k = self.k[-1]
+
         points, w = self.sigma_points(self.n_points, state, k)
         state_est = np.average(
             [transition(point) * self.dt + state for point in points], axis=0, weights=w
@@ -65,6 +78,7 @@ class UnscentedKalmanFilter(Estimator):
 
     @override
     def correct_step(self, data: np.ndarray) -> None:
+        self.k[-1] = fix(self.k[-1])
         points, w = self.sigma_points(self.n_points, self.state[-1], self.k[-1])
         measurement_est = np.average(
             [measurement(point) for point in points], axis=0, weights=w

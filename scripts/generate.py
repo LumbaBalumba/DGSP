@@ -1,12 +1,15 @@
 import os
 
 from joblib import Parallel, delayed
+import numpy as np
 
 import dgsp.model as model
 from scripts import dt_sim, T_MAX
 
 
-NUM_TRAJECTORIES = 10000
+NUM_TRAJECTORIES = 1
+
+np.random.seed(100)
 
 if not os.path.exists("data/traj"):
     os.makedirs("data/traj")

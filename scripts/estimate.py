@@ -13,6 +13,9 @@ from scripts.generate import NUM_TRAJECTORIES
 
 def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
     meas = np.load(f"data/meas/{traj_n}.npy")
+    traj_init = np.load(f"data/traj/{traj_n}.npy")[0, :]
+
+    estimator.state[0] = traj_init
 
     pred_step = int(dt_pred / dt_sim)
     correct_step = int(dt_meas / dt_sim)
