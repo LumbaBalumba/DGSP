@@ -7,7 +7,7 @@ from dgsp.estimators.base import Estimator
 from dgsp.functions import Q, R, transition, measurement
 
 
-@numba.jit(nopython=True)
+@numba.njit
 def square(x: np.ndarray) -> np.ndarray:
     return x.reshape((-1, 1)) @ x.reshape((-1, 1)).T
 

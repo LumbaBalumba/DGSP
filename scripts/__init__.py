@@ -1,4 +1,4 @@
-T_MAX = 1e1
+T_MAX = 1e0
 
 dt_sim = 1e-3
 dt_pred = dt_sim
