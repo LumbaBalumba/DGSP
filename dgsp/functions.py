@@ -36,17 +36,17 @@ measurement_c = numba.njit()(sp.lambdify(x, sp_measurement))
 measurement = lambda x: measurement_c(*x).reshape((-1))
 
 
-@numba.jit(nopython=True)
+@numba.njit()
 def transition_noise() -> np.ndarray:
-    noise = np.empty(4)
-    for i in range(4):
+    noise = np.empty(dim_state)
+    for i in range(dim_state):
         noise[i] = np.random.normal(0, Q[i, i] ** 0.5)
     return noise
 
 
-@numba.jit(nopython=True)
+@numba.njit()
 def measurement_noise() -> np.ndarray:
-    noise = np.empty(2)
-    for i in range(2):
+    noise = np.empty(dim_measurement)
+    for i in range(dim_measurement):
         noise[i] = np.random.normal(0, R[i, i] ** 0.5)
     return noise
