@@ -8,19 +8,19 @@ from dgsp.estimators.base import Estimator
 from dgsp.estimators.particle import ParticleFilter
 from dgsp.estimators.trivial import TrivialEstimator
 from dgsp.estimators.unscented import UnscentedKalmanFilter
-from scripts import dt_pred, dt_meas, dt_sim, NUM_TRAJECTORIES
+from scripts import dt_pred, dt_obs, dt_sim, NUM_TRAJECTORIES
 
 
 def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
-    meas = np.load(f"data/obs/{traj_n}.npy")
+    obs = np.load(f"data/obs/{traj_n}.npy")
 
     pred_step = int(dt_pred / dt_sim)
-    correct_step = int(dt_meas / dt_sim)
+    correct_step = int(dt_obs / dt_sim)
 
-    for i in range(0, len(meas), pred_step):
+    for i in range(0, len(obs), pred_step):
         estimator.predict()
-        if i % correct_step == 0:
-            estimator.update(meas[i])
+        # if i % correct_step == 0:
+        #     estimator.update(meas[i])
 
     traj_est, k_est = estimator.state, estimator.k
 
@@ -62,7 +62,7 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
 
 
 def estimate(parallel: bool = True) -> None:
-    types = ["trivial", "ukf", "ukfr"]
+    types = ["pf"]
     for estimator_type in types:
         print(f"Running {estimator_type} estimator")
         estimate_all(estimator_type, parallel)

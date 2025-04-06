@@ -1,6 +1,6 @@
 T_MAX = 1e1
 dt_sim = 1e-3
 dt_pred = dt_sim
-dt_meas = dt_pred * 10
+dt_obs = dt_pred * 10
 
-NUM_TRAJECTORIES = 10000
+NUM_TRAJECTORIES = 32
