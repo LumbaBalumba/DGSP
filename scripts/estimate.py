@@ -19,8 +19,8 @@ def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
 
     for i in range(0, len(obs), pred_step):
         estimator.predict()
-        # if i % correct_step == 0:
-        #     estimator.update(meas[i])
+        if i % correct_step == 0:
+            estimator.update(obs[i])
 
     traj_est, k_est = estimator.state, estimator.k
 

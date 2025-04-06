@@ -57,13 +57,10 @@ class ParticleFilter(Estimator):
 
     @override
     def update(self, data: np.ndarray) -> None:
-        observations = [observation(particle) for particle in self.particles]
-        for i in range(self.n_particles):
-            distance = np.linalg.norm(observations[i] - data, axis=0)
-            self.weights[i] *= norm(
-                mean=np.ones(dim_observation) * distance, cov=R
-            ).pdf(data)
+        observations_est = np.apply_along_axis(observation, arr=self.particles, axis=1)
 
+        likelihood = norm(mean=data, cov=R).pdf(observations_est)
+        self.weights *= likelihood
         self.weights += 1e-300
         self.weights /= np.sum(self.weights)
 
