@@ -8,10 +8,10 @@ from dgsp.functions import (
     R,
     initial,
     transition,
-    measurement,
+    observation,
     transition_noise,
     dim_state,
-    dim_measurement,
+    dim_observation,
 )
 
 
@@ -57,11 +57,11 @@ class ParticleFilter(Estimator):
 
     @override
     def update(self, data: np.ndarray) -> None:
-        measurements = [measurement(particle) for particle in self.particles]
+        observations = [observation(particle) for particle in self.particles]
         for i in range(self.n_particles):
-            distance = np.linalg.norm(measurements[i] - data, axis=0)
+            distance = np.linalg.norm(observations[i] - data, axis=0)
             self.weights[i] *= norm(
-                mean=np.ones(dim_measurement) * distance, cov=R
+                mean=np.ones(dim_observation) * distance, cov=R
             ).pdf(data)
 
         self.weights += 1e-300

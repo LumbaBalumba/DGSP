@@ -3,11 +3,11 @@ import numpy as np
 from dgsp.functions import (
     transition,
     transition_noise,
-    measurement,
-    measurement_noise,
+    observation,
+    observation_noise,
     initial,
     dim_state,
-    dim_measurement,
+    dim_observation,
 )
 
 
@@ -22,8 +22,8 @@ class RobotSystem:
         self.trajectory = np.random.normal(self.init, 0.3 * np.ones(dim_state)).reshape(
             (-1, dim_state)
         )
-        self.measurements = measurement(self.trajectory[0]).reshape(
-            (-1, dim_measurement)
+        self.measurements = observation(self.trajectory[0]).reshape(
+            (-1, dim_observation)
         )
         self.time = 0.0
         self.dt = dt
@@ -32,7 +32,7 @@ class RobotSystem:
     def step(self) -> None:
         old_state = self.trajectory[-1]
         new_state = old_state + transition(old_state) * self.dt + transition_noise()
-        new_measurement = measurement(new_state) + measurement_noise()
+        new_measurement = observation(new_state) + observation_noise()
         self.trajectory = np.append(self.trajectory, [new_state], axis=0)
         self.measurements = np.append(self.measurements, [new_measurement], axis=0)
         self.time += self.dt

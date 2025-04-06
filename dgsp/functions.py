@@ -11,7 +11,7 @@ l = 0.1
 Q = np.diag([3e-3, 3e-3, 3e-1, 3e-1]) / 1e4
 R = np.eye(2) / 1e3
 u1 = 3.0
-u2 = 1e-1 / 20 * 0
+u2 = 1e-1 / 20
 
 initial = np.array([0.0, 0.0, 0.0, 0.0])
 
@@ -24,16 +24,16 @@ sp_transition = sp.Matrix(
         u2,
     ]
 )
-sp_measurement = sp.Matrix([(x1**2 + x2**2) ** 0.5, sp.atan2(x2, x1)])
+sp_observation = sp.Matrix([(x1**2 + x2**2) ** 0.5, sp.atan2(x2, x1)])
 
 dim_state = sp_transition.shape[0]
-dim_measurement = sp_measurement.shape[0]
+dim_observation = sp_observation.shape[0]
 
 transition_c = numba.njit()(sp.lambdify(x, sp_transition))
 transition = lambda x: transition_c(*x).reshape((-1))
 
-measurement_c = numba.njit()(sp.lambdify(x, sp_measurement))
-measurement = lambda x: measurement_c(*x).reshape((-1))
+observation_c = numba.njit()(sp.lambdify(x, sp_observation))
+observation = lambda x: observation_c(*x).reshape((-1))
 
 
 @numba.njit()
@@ -45,8 +45,8 @@ def transition_noise() -> np.ndarray:
 
 
 @numba.njit()
-def measurement_noise() -> np.ndarray:
-    noise = np.empty(dim_measurement)
-    for i in range(dim_measurement):
+def observation_noise() -> np.ndarray:
+    noise = np.empty(dim_observation)
+    for i in range(dim_observation):
         noise[i] = np.random.normal(0, R[i, i] ** 0.5)
     return noise
