@@ -4,7 +4,15 @@ import numpy as np
 from filterpy.kalman import UnscentedKalmanFilter as UKF, MerweScaledSigmaPoints
 
 from dgsp.estimators.base import Estimator
-from dgsp.functions import Q, R, transition, measurement, initial
+from dgsp.functions import (
+    Q,
+    R,
+    transition,
+    measurement,
+    initial,
+    dim_state,
+    dim_measurement,
+)
 
 
 class UnscentedKalmanFilter(Estimator):
@@ -19,9 +27,16 @@ class UnscentedKalmanFilter(Estimator):
         def hx(x: np.ndarray) -> np.ndarray:
             return measurement(x)
 
-        points = MerweScaledSigmaPoints(4, alpha=0.1, beta=2.0, kappa=-1.0)
+        points = MerweScaledSigmaPoints(dim_state, alpha=0.1, beta=2.0, kappa=-1.0)
 
-        self.kf = UKF(dt=self.dt, dim_x=4, dim_z=2, fx=fx, hx=hx, points=points)
+        self.kf = UKF(
+            dt=self.dt,
+            dim_x=dim_state,
+            dim_z=dim_measurement,
+            fx=fx,
+            hx=hx,
+            points=points,
+        )
         self.kf.x = initial
         self.kf.P *= 0.2
 

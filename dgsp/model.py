@@ -6,6 +6,8 @@ from dgsp.functions import (
     measurement,
     measurement_noise,
     initial,
+    dim_state,
+    dim_measurement,
 )
 
 
@@ -17,8 +19,12 @@ class RobotSystem:
     init: np.ndarray = np.array(initial, dtype=float)
 
     def __init__(self, dt: float, t_max: float) -> None:
-        self.trajectory = np.random.normal(self.init, 0.3 * np.ones(4)).reshape((-1, 4))
-        self.measurements = measurement(self.trajectory[0]).reshape((-1, 2))
+        self.trajectory = np.random.normal(self.init, 0.3 * np.ones(dim_state)).reshape(
+            (-1, dim_state)
+        )
+        self.measurements = measurement(self.trajectory[0]).reshape(
+            (-1, dim_measurement)
+        )
         self.time = 0.0
         self.dt = dt
         self.t_max = t_max

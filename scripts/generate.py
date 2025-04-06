@@ -4,10 +4,8 @@ from joblib import Parallel, delayed
 import numpy as np
 
 import dgsp.model as model
-from scripts import dt_sim, T_MAX
+from scripts import dt_sim, T_MAX, NUM_TRAJECTORIES
 
-
-NUM_TRAJECTORIES = 10000
 
 np.random.seed(100)
 

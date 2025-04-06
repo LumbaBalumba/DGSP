@@ -24,14 +24,16 @@ sp_transition = sp.Matrix(
         u2,
     ]
 )
-transition_c = numba.njit()(sp.lambdify(x, sp_transition))
-transition = lambda x: transition_c(x[0], x[1], x[2], x[3]).reshape((-1))
-transition_J = sp.lambdify(x, sp_transition.jacobian(x))
-
 sp_measurement = sp.Matrix([(x1**2 + x2**2) ** 0.5, sp.atan2(x2, x1)])
+
+dim_state = sp_transition.shape[0]
+dim_measurement = sp_measurement.shape[0]
+
+transition_c = numba.njit()(sp.lambdify(x, sp_transition))
+transition = lambda x: transition_c(*x).reshape((-1))
+
 measurement_c = numba.njit()(sp.lambdify(x, sp_measurement))
-measurement = lambda x: measurement_c(x[0], x[1], x[2], x[3]).reshape((-1))
-measurement_J = sp.lambdify(x, sp_measurement.jacobian(x))
+measurement = lambda x: measurement_c(*x).reshape((-1))
 
 
 @numba.jit(nopython=True)

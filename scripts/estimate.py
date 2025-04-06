@@ -5,6 +5,7 @@ from joblib import Parallel, delayed
 import numpy as np
 
 from dgsp.estimators.base import Estimator
+from dgsp.estimators.particle import ParticleFilter
 from dgsp.estimators.trivial import TrivialEstimator
 from dgsp.estimators.unscented import UnscentedKalmanFilter
 from scripts import dt_pred, dt_meas, dt_sim
@@ -46,6 +47,8 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
         case "trivial":
             all_traj = [np.load(f"data/traj/{i}.npy") for i in range(NUM_TRAJECTORIES)]
             estimator = TrivialEstimator(dt_pred, np.array(all_traj))
+        case "pf":
+            estimator = ParticleFilter(dt_pred, 1000)
         case _:
             raise RuntimeError(f"Invalid estimator type: {estimator_type}")
 
@@ -60,7 +63,7 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
 
 
 def estimate(parallel: bool = True) -> None:
-    types = ["ukf", "ukfr", "trivial"]
+    types = ["pf"]
     for estimator_type in types:
         print(f"Running {estimator_type} estimator")
         estimate_all(estimator_type, parallel)
