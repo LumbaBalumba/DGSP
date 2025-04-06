@@ -11,12 +11,10 @@ from dgsp.functions import (
     observation,
     transition_noise,
     dim_state,
-    dim_observation,
 )
 
 
 class ParticleFilter(Estimator):
-
     n_particles: int
     particles: np.ndarray
     weights: np.ndarray
@@ -41,7 +39,6 @@ class ParticleFilter(Estimator):
         state_est = np.average(self.particles, weights=self.weights, axis=0)
         k_est = np.diag(
             np.average((state_est - self.particles) ** 2, weights=self.weights, axis=0)
-            ** 0.5
         )
 
         self.state.append(state_est)
