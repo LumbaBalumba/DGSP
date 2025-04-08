@@ -4,10 +4,15 @@ from copy import deepcopy
 from joblib import Parallel, delayed
 import numpy as np
 
-from dgsp.estimators.base import Estimator
-from dgsp.estimators.particle import ParticleFilter
-from dgsp.estimators.trivial import TrivialEstimator
-from dgsp.estimators.unscented import UnscentedKalmanFilter
+from dgsp.estimators import (
+    Estimator,
+    TrivialEstimator,
+    ExtendedKalmanFilter,
+    CubatureKalmanFilter,
+    UnscentedKalmanFilter,
+    ParticleFilter,
+    MinMaxFilter,
+)
 from scripts import dt_pred, dt_obs, dt_sim, NUM_TRAJECTORIES
 
 
@@ -25,7 +30,8 @@ def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
     traj_est, k_est = estimator.state, estimator.k
 
     new_path_dir = os.path.join("data", "estimate", estimator_dir)
-    os.removedirs(new_path_dir)
+    if os.path.exists(new_path_dir):
+        os.removedirs(new_path_dir)
     new_path_traj = os.path.join(new_path_dir, "traj")
     new_path_k = os.path.join(new_path_dir, "k")
 
@@ -40,10 +46,18 @@ def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
 
 def estimate_all(estimator_type: str, parallel: bool = True) -> None:
     match estimator_type:
+        case "ekf":
+            estimator = ExtendedKalmanFilter(dt_pred)
+        case "ekfr":
+            estimator = ExtendedKalmanFilter(dt_pred, square_root=True)
         case "ukf":
             estimator = UnscentedKalmanFilter(dt_pred)
         case "ukfr":
             estimator = UnscentedKalmanFilter(dt_pred, square_root=True)
+        case "ckf":
+            estimator = CubatureKalmanFilter(dt_pred)
+        case "ckfr":
+            estimator = CubatureKalmanFilter(dt_pred, square_root=True)
         case "trivial":
             all_traj = [
                 np.load(os.path.join("data", "traj", f"{i}.npy"))
@@ -52,6 +66,10 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
             estimator = TrivialEstimator(dt_pred, np.array(all_traj))
         case "pf":
             estimator = ParticleFilter(dt_pred, 1000)
+        case "pfb":
+            estimator = ParticleFilter(dt_pred, 1000, bootstrap=True)
+        case "cmnf":
+            estimator = MinMaxFilter(dt_pred, 1000)
         case _:
             raise RuntimeError(f"Invalid estimator type: {estimator_type}")
 
@@ -66,7 +84,7 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
 
 
 def estimate(parallel: bool = True) -> None:
-    types = ["pf", "ukf", "ukfr", "trivial"]
+    types = ["ckf"]
     for estimator_type in types:
         print(f"Running {estimator_type} estimator")
         estimate_all(estimator_type, parallel)

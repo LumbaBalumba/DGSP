@@ -19,7 +19,7 @@ class ParticleFilter(Estimator):
     particles: np.ndarray
     weights: np.ndarray
 
-    def __init__(self, dt: float, n_particles: int = 1000) -> None:
+    def __init__(self, dt: float, n_particles: int = 1000, bootstrap=False) -> None:
         super().__init__(dt)
         self.n_particles = n_particles
         self.particles = np.random.multivariate_normal(
