@@ -4,6 +4,7 @@ import numba
 
 
 x1, x2, theta, phi = sp.symbols(r"x_1 x_2 \theta \phi")
+t = sp.Symbol("t")
 x = sp.Matrix([x1, x2, theta, phi])
 
 
@@ -30,11 +31,14 @@ sp_observation = sp.Matrix([(x1**2 + x2**2) ** 0.5, sp.atan2(x2, x1)])
 dim_state = sp_transition.shape[0]
 dim_observation = sp_observation.shape[0]
 
-transition_c = numba.njit()(sp.lambdify(x, sp_transition))
-transition = lambda x: transition_c(*x).reshape((-1))
 
-observation_c = numba.njit()(sp.lambdify(x, sp_observation))
-observation = lambda x: observation_c(*x).reshape((-1))
+def prettify(func):
+    func_c = numba.njit()(sp.lambdify([*x, t], func))
+    return lambda x, t: func_c(*x, t).reshape((-1))
+
+
+transition = prettify(sp_transition)
+observation = prettify(sp_observation)
 
 
 @numba.njit()

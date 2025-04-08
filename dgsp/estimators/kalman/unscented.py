@@ -22,10 +22,10 @@ class UnscentedKalmanFilter(Estimator):
         super().__init__(dt)
 
         def fx(x: np.ndarray, dt: float) -> np.ndarray:
-            return transition(x) * dt + x
+            return transition(x, self.time) * dt + x
 
         def hx(x: np.ndarray) -> np.ndarray:
-            return observation(x)
+            return observation(x, self.time)
 
         points = MerweScaledSigmaPoints(dim_state, alpha=0.1, beta=2.0, kappa=-1.0)
 

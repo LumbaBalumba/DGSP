@@ -31,7 +31,7 @@ class ParticleFilter(Estimator):
     @override
     def predict(self) -> None:
         self.particles += self.dt * np.apply_along_axis(
-            transition, arr=self.particles, axis=1
+            lambda x: transition(x, self.time), arr=self.particles, axis=1
         )
         for i in range(self.n_particles):
             self.particles[i] += transition_noise()
@@ -54,7 +54,9 @@ class ParticleFilter(Estimator):
 
     @override
     def update(self, data: np.ndarray) -> None:
-        observations_est = np.apply_along_axis(observation, arr=self.particles, axis=1)
+        observations_est = np.apply_along_axis(
+            lambda x: observation(x, self.time), arr=self.particles, axis=1
+        )
 
         likelihood = norm(mean=data, cov=R).pdf(observations_est)
         self.weights *= likelihood
