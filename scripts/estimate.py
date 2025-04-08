@@ -30,8 +30,6 @@ def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
     traj_est, k_est = estimator.state, estimator.k
 
     new_path_dir = os.path.join("data", "estimate", estimator_dir)
-    if os.path.exists(new_path_dir):
-        os.removedirs(new_path_dir)
     new_path_traj = os.path.join(new_path_dir, "traj")
     new_path_k = os.path.join(new_path_dir, "k")
 
@@ -84,7 +82,7 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
 
 
 def estimate(parallel: bool = True) -> None:
-    types = ["ckf"]
+    types = ["trivial", "ukf", "ukfr", "pf"]
     for estimator_type in types:
         print(f"Running {estimator_type} estimator")
         estimate_all(estimator_type, parallel)
