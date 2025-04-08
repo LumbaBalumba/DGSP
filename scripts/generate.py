@@ -1,22 +1,20 @@
 import os
 
 from joblib import Parallel, delayed
-import numpy as np
 
 import dgsp.model as model
 from scripts import dt_sim, T_MAX, NUM_TRAJECTORIES
 
 
-np.random.seed(100)
-
-if not os.path.exists("data/traj"):
-    os.makedirs("data/traj")
-
-if not os.path.exists("data/obs"):
-    os.makedirs("data/obs")
-
-
 def generate_one(idx: int) -> None:
+    os.removedirs("./data")
+
+    if not os.path.exists("data/traj"):
+        os.makedirs("data/traj")
+
+    if not os.path.exists("data/obs"):
+        os.makedirs("data/obs")
+
     system = model.RobotSystem(dt=dt_sim, t_max=T_MAX)
     system.simulate()
     traj_filename = os.path.join("data", "traj", f"{idx}.npy")
