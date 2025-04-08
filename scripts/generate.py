@@ -7,13 +7,13 @@ from scripts import dt_sim, T_MAX, NUM_TRAJECTORIES
 
 
 def generate_one(idx: int) -> None:
-    os.removedirs("./data")
+    os.removedirs("data")
 
-    if not os.path.exists("data/traj"):
-        os.makedirs("data/traj")
+    if not os.path.exists(os.path.join("data", "traj")):
+        os.makedirs(os.path.join("data", "traj"))
 
-    if not os.path.exists("data/obs"):
-        os.makedirs("data/obs")
+    if not os.path.exists(os.path.join("data", "obs")):
+        os.makedirs(os.path.join("data", "obs"))
 
     system = model.RobotSystem(dt=dt_sim, t_max=T_MAX)
     system.simulate()

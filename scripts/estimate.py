@@ -12,7 +12,7 @@ from scripts import dt_pred, dt_obs, dt_sim, NUM_TRAJECTORIES
 
 
 def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
-    obs = np.load(f"data/obs/{traj_n}.npy")
+    obs = np.load(os.path.join("data", "obs", f"{traj_n}.npy"))
 
     pred_step = int(dt_pred / dt_sim)
     correct_step = int(dt_obs / dt_sim)
@@ -45,7 +45,10 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
         case "ukfr":
             estimator = UnscentedKalmanFilter(dt_pred, square_root=True)
         case "trivial":
-            all_traj = [np.load(f"data/traj/{i}.npy") for i in range(NUM_TRAJECTORIES)]
+            all_traj = [
+                np.load(os.path.join("data", "traj", f"{i}.npy"))
+                for i in range(NUM_TRAJECTORIES)
+            ]
             estimator = TrivialEstimator(dt_pred, np.array(all_traj))
         case "pf":
             estimator = ParticleFilter(dt_pred, 1000)
