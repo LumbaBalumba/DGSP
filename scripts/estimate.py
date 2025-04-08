@@ -12,8 +12,6 @@ from scripts import dt_pred, dt_obs, dt_sim, NUM_TRAJECTORIES
 
 
 def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
-    os.removedirs(f"./data/estimate/{estimator_dir}")
-
     obs = np.load(f"data/obs/{traj_n}.npy")
 
     pred_step = int(dt_pred / dt_sim)
@@ -27,6 +25,7 @@ def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
     traj_est, k_est = estimator.state, estimator.k
 
     new_path_dir = os.path.join("data", "estimate", estimator_dir)
+    os.removedirs(new_path_dir)
     new_path_traj = os.path.join(new_path_dir, "traj")
     new_path_k = os.path.join(new_path_dir, "k")
 
