@@ -27,11 +27,9 @@ sp_transition = sp.Matrix(
     ]
 )
 sp_transition_j = sp_transition.jacobian(x)
-sp_transition_h = sp_transition_j.jacobian(x)
 
 sp_observation = sp.Matrix([(x1**2 + x2**2) ** 0.5, sp.atan2(x2, x1)])
 sp_observation_j = sp_observation.jacobian(x)
-sp_observation_h = sp_observation_j.jacobian(x)
 
 dim_state = sp_transition.shape[0]
 dim_observation = sp_observation.shape[0]
@@ -44,11 +42,9 @@ def prettify(func):
 
 transition = prettify(sp_transition)
 transition_j = prettify(sp_transition_j)
-transition_h = prettify(sp_transition_h)
 
 observation = prettify(sp_observation)
 observation_j = prettify(sp_observation_j)
-observation_h = prettify(sp_observation_h)
 
 
 @numba.njit()
