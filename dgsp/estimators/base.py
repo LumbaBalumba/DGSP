@@ -22,4 +22,4 @@ class Estimator:
         self.time += self.dt
 
     def update(self, data: np.ndarray) -> None:
-        self.time += self.dt
+        pass
