@@ -3,12 +3,9 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 
 from dgsp.functions import dim_state
-from scripts import ESTIMATORS, T_MAX, dt_pred
-
-COLORS = ["red", "blue", "orange", "green", "black"]
+from scripts import ESTIMATORS, NUM_TRAJECTORIES, T_MAX, dt_pred
 
 
 def example() -> None:
@@ -124,5 +121,68 @@ def example() -> None:
         plot_err(i)
 
 
+def mass_error() -> None:
+    t = np.linspace(0, T_MAX, int(np.ceil(T_MAX / dt_pred)))
+    trajs = np.array(
+        [
+            np.load(os.path.join("data", "traj", f"{i}.npy"))
+            for i in range(NUM_TRAJECTORIES)
+        ]
+    )
+    trajs = trajs[:, : len(t), :]
+    std = trajs.std(axis=0)
+
+    df = {}
+
+    for estimator in ESTIMATORS:
+        trajs_est = np.array(
+            [
+                np.load(os.path.join("data", "estimate", estimator, "traj", f"{i}.npy"))
+                for i in range(NUM_TRAJECTORIES)
+            ]
+        )
+        trajs_est = trajs_est[:, : len(t), :]
+
+        converge = np.array(
+            [
+                (np.abs(trajs[i] - trajs_est[i]) < std).all()
+                for i in range(NUM_TRAJECTORIES)
+            ]
+        )
+
+        df[estimator] = (trajs_est, converge)
+
+    def error(all: bool) -> None:
+        errs = {}
+
+        for estimator in ESTIMATORS:
+            if all:
+                errs[estimator] = np.std(trajs - df[estimator][0], axis=0)
+            else:
+                errs[estimator] = np.std(
+                    trajs[df[estimator][1], :, :]
+                    - df[estimator][0][df[estimator][1], :, :],
+                    axis=0,
+                )
+
+        for i in range(dim_state):
+            plt.figure(figsize=(20, 10))
+            for estimator in ESTIMATORS:
+                plt.plot(
+                    t,
+                    errs[estimator][:, i],
+                    label=estimator.upper(),
+                )
+            plt.legend()
+            dname = os.path.join("img", "err", "all" if all else "conv")
+            if not os.path.exists(dname):
+                os.makedirs(dname)
+            plt.savefig(os.path.join(dname, f"{i}.png"))
+
+    error(False)
+    error(True)
+
+
 def stats() -> None:
     example()
+    mass_error()
