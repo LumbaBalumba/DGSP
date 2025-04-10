@@ -7,8 +7,6 @@ from scripts import dt_sim, T_MAX, NUM_TRAJECTORIES
 
 
 def generate_one(idx: int) -> None:
-    os.removedirs("data")
-
     if not os.path.exists(os.path.join("data", "traj")):
         os.makedirs(os.path.join("data", "traj"))
 

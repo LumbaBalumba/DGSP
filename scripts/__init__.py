@@ -3,4 +3,6 @@ dt_sim = 1e-3
 dt_pred = dt_sim
 dt_obs = dt_pred * 10
 
-NUM_TRAJECTORIES =
+NUM_TRAJECTORIES = 10
+
+ESTIMATORS = ["trivial", "ukf", "ukfr", "pf"]
