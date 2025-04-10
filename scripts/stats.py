@@ -10,16 +10,28 @@ from scripts import ESTIMATORS, T_MAX, dt_pred
 def stats() -> None:
     example_traj_num = 0
 
-    traj = np.load(f"./data/traj/{example_traj_num}.npy")
+    traj = np.load(os.path.join("data", "traj", f"{example_traj_num}.npy"))
 
     t = np.linspace(0, T_MAX, int(np.ceil(T_MAX / dt_pred)))
     traj = traj[:: len(traj) // len(t)][: len(t)]
     traj_estimates = [
-        np.load(f"./data/estimate/{estimator}/traj/{example_traj_num}.npy")
+        np.load(
+            os.path.join(
+                "data",
+                "estimate",
+                f"{estimator}",
+                "traj",
+                f"{example_traj_num}.npy",
+            )
+        )
         for estimator in ESTIMATORS
     ]
     k_estimates = [
-        np.load(f"./data/estimate/{estimator}/k/{example_traj_num}.npy")
+        np.load(
+            os.path.join(
+                "data", "estimate", f"{estimator}", "k", f"{example_traj_num}.npy"
+            )
+        )
         for estimator in ESTIMATORS
     ]
 
