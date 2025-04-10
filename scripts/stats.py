@@ -74,6 +74,7 @@ def example() -> None:
     for i in range(dim_state):
         plot(i)
         plt.savefig(os.path.join("img", "example", f"estimate_{i}.png"))
+        plt.clf()
 
 
 def stats() -> None:
