@@ -5,7 +5,6 @@ from filterpy.monte_carlo import systematic_resample
 
 from dgsp.estimators.base import Estimator
 from dgsp.functions import (
-    R,
     initial,
     transition,
     observation,
