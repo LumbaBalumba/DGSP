@@ -7,7 +7,6 @@ from dgsp.functions import (
     observation_noise,
     initial,
     dim_state,
-    dim_observation,
 )
 
 
