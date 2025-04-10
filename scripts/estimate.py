@@ -48,6 +48,10 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
             estimator = ExtendedKalmanFilter(dt_pred)
         case "ekfr":
             estimator = ExtendedKalmanFilter(dt_pred, square_root=True)
+        case "ekf2":
+            estimator = ExtendedKalmanFilter(dt_pred, order=2)
+        case "ekf2r":
+            estimator = ExtendedKalmanFilter(dt_pred, order=2, square_root=True)
         case "ukf":
             estimator = UnscentedKalmanFilter(dt_pred)
         case "ukfr":
