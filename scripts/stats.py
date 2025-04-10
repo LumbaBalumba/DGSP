@@ -1,4 +1,5 @@
 import os
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -61,9 +62,10 @@ def example() -> None:
         df_x.to_csv(os.path.join("stats", f"example_x_{component}.csv"), index=False)
         df_k.to_csv(os.path.join("stats", f"example_k_{component}.csv"), index=False)
 
-    def plot(i: int) -> None:
-        df = pd.read_csv(os.path.join("stats", f"example_x_{i}.csv"))
-        plt.plot(df["t"], df["x"])
+    def plot(i: int, data: Literal["x"] | Literal["k"] = "x") -> None:
+        df = pd.read_csv(os.path.join("stats", f"example_{data}_{i}.csv"))
+        if data == "x":
+            plt.plot(df["t"], df["x"])
         plt.plot(df["t"], df["ukf"])
         plt.plot(df["t"], df["ukfr"])
         plt.plot(df["t"], df["pf"])
@@ -72,8 +74,13 @@ def example() -> None:
         os.makedirs(os.path.join("img", "example"))
 
     for i in range(dim_state):
-        plot(i)
+        plot(i, "x")
         plt.savefig(os.path.join("img", "example", f"estimate_{i}.png"))
+        plt.clf()
+
+    for i in range(dim_state):
+        plot(i, "k")
+        plt.savefig(os.path.join("img", "example", f"err_{i}.png"))
         plt.clf()
 
 
