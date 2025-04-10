@@ -58,7 +58,7 @@ class ParticleFilter(Estimator):
             lambda x: observation(x, self.time), arr=self.particles, axis=1
         )
 
-        likelihood = norm(mean=data, cov=R).pdf(observations_est)
+        likelihood = norm(mean=data, cov=self.R).pdf(observations_est)
         self.weights *= likelihood
         self.weights += 1e-300
         self.weights /= np.sum(self.weights)

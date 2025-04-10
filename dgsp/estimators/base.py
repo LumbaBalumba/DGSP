@@ -1,6 +1,6 @@
 import numpy as np
 
-from dgsp.functions import initial, Q
+from dgsp.functions import initial, Q, R
 from scripts import dt_sim, dt_pred
 
 
@@ -17,9 +17,10 @@ class Estimator:
         dt: float,
     ) -> None:
         self.Q = Q / dt_sim * dt_pred
+        self.R = R / dt_sim * dt_pred
         self.dt = dt
         self.state = [initial]
-        self.k = [Q]
+        self.k = [self.Q]
         self.time = 0.0
 
     def predict(self) -> None:

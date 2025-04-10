@@ -40,8 +40,8 @@ class UnscentedKalmanFilter(Estimator):
         self.kf.x = initial
         self.kf.P *= 0.2
 
-        self.kf.Q = Q
-        self.kf.R = R
+        self.kf.Q = self.Q
+        self.kf.R = self.R
 
     @override
     def predict(self) -> None:
