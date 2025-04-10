@@ -16,8 +16,8 @@ class Estimator:
         self,
         dt: float,
     ) -> None:
-        self.Q = Q / dt_sim * dt_pred
-        self.R = R / dt_sim * dt_pred
+        self.Q = Q * (dt_pred / dt_sim)
+        self.R = R * (dt_pred / dt_sim)
         self.dt = dt
         self.state = [initial]
         self.k = [self.Q]
