@@ -57,5 +57,5 @@ def stats() -> None:
                 **{estimator: est for estimator, est in zip(ESTIMATORS, std_est)},
             }
         )
-        df_x.to_csv(f"./stats/example_x_{component}.csv")
-        df_k.to_csv(f"./stats/example_k_{component}.csv")
+        df_x.to_csv(os.path.join("stats", f"example_x_{component}.csv"))
+        df_k.to_csv(os.path.join("stats", f"example_k_{component}.csv"))
