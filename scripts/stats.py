@@ -68,9 +68,9 @@ def example() -> None:
         df = pd.read_csv(os.path.join("stats", f"example_x_{i}.csv"))
 
         plt.figure(figsize=(20, 10))
+        plt.plot(df["t"], df["x"], label=True)
         for estimator in ESTIMATORS:
             plt.plot(df["t"], df[estimator], label=estimator.upper())
-
         plt.legend()
 
     if not os.path.exists(os.path.join("img", "example")):
