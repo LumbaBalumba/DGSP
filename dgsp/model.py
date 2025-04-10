@@ -12,29 +12,28 @@ from dgsp.functions import (
 
 
 class RobotSystem:
-    trajectory: np.ndarray
+    trajectory: list[np.ndarray]
+    measurements: list[np.ndarray]
     time: float
     dt: float
     t_max: float
     init: np.ndarray = np.array(initial, dtype=float)
 
     def __init__(self, dt: float, t_max: float) -> None:
-        self.trajectory = np.random.normal(self.init, 0.3 * np.ones(dim_state)).reshape(
-            (-1, dim_state)
-        )
-        self.measurements = observation(self.trajectory[0]).reshape(
-            (-1, dim_observation)
-        )
+        self.trajectory = [np.random.normal(self.init, 0.3 * np.ones(dim_state))]
         self.time = 0.0
+        self.measurements = [observation(self.trajectory[0], self.time)]
         self.dt = dt
         self.t_max = t_max
 
     def step(self) -> None:
         old_state = self.trajectory[-1]
-        new_state = old_state + transition(old_state) * self.dt + transition_noise()
-        new_measurement = observation(new_state) + observation_noise()
-        self.trajectory = np.append(self.trajectory, [new_state], axis=0)
-        self.measurements = np.append(self.measurements, [new_measurement], axis=0)
+        new_state = (
+            old_state + transition(old_state, self.time) * self.dt + transition_noise()
+        )
+        new_measurement = observation(new_state, self.time) + observation_noise()
+        self.trajectory.append(new_state)
+        self.measurements.append(new_measurement)
         self.time += self.dt
 
     def simulate(self) -> None:
