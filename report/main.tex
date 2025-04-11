@@ -141,9 +141,9 @@
 
 Все необходимые для фильтрации параметры были посчитаны аналитически во время работы программы с помощью соответствующих пакетов Python (filterpy, sympy). Реализации всех фильтров также взяты из соответствующих пакетов на Python. Для достижения большей точности были использованы 128-битные числа с плавающей точкой (стандарт IEEE 754).
 
+Все расчёты проводились на пучке траекторий объёмом 10000.
+
 \subsection{Сравнение работы алгоритмов}
-
-
 \begin{landscape}
 	\subsubsection{Оценки траектории}
 	\captionof{figure}{Оценка $x_1$}
@@ -168,11 +168,6 @@
 \newpage
 
 \begin{landscape}
-	\subsubsection{Ошибки оценивания $x_1$}
-	\includegraphics[width=1.0\linewidth]{example/err_0_trivial.png}\newpage
-\end{landscape}
-
-\begin{landscape}
 	\includegraphics[width=1.0\linewidth]{example/err_0_ukf.png}\newpage
 \end{landscape}
 
@@ -182,11 +177,6 @@
 
 \begin{landscape}
 	\includegraphics[width=1.0\linewidth]{example/err_0_pf.png}\newpage
-\end{landscape}
-
-\begin{landscape}
-	\subsubsection{Ошибки оценивания $x_2$}
-	\includegraphics[width=1.0\linewidth]{example/err_1_trivial.png}\newpage
 \end{landscape}
 
 \begin{landscape}
@@ -202,11 +192,6 @@
 \end{landscape}
 
 \begin{landscape}
-	\subsubsection{Ошибки оценивания $\theta$}
-	\includegraphics[width=1.0\linewidth]{example/err_2_trivial.png}\newpage
-\end{landscape}
-
-\begin{landscape}
 	\includegraphics[width=1.0\linewidth]{example/err_2_ukf.png}\newpage
 \end{landscape}
 
@@ -216,11 +201,6 @@
 
 \begin{landscape}
 	\includegraphics[width=1.0\linewidth]{example/err_2_pf.png}\newpage
-\end{landscape}
-
-\begin{landscape}
-	\subsubsection{Ошибки оценивания $\phi$}
-	\includegraphics[width=1.0\linewidth]{example/err_3_trivial.png}\newpage
 \end{landscape}
 
 \begin{landscape}

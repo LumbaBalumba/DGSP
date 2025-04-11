@@ -187,7 +187,7 @@ def mass_error() -> None:
                 if estimator == "trivial":
                     continue
                 plt.xlabel("Время")
-                plt.ylabel("Средняя ошибка")
+                plt.ylabel("СКО")
                 plt.plot(
                     t,
                     errs[estimator][:, i],
