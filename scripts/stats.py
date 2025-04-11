@@ -200,7 +200,7 @@ def mass_error() -> None:
                 "estimator": [
                     estimator for estimator in ESTIMATORS if estimator != "trivial"
                 ],
-                "divergence": div,
+                "divergence": np.round(div, 2),
             }
         )
         df_div.to_csv(os.path.join("stats", "diverge.csv"), index=False)
