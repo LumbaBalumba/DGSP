@@ -135,6 +135,8 @@ def mass_error() -> None:
     df = {}
 
     for estimator in ESTIMATORS:
+        if estimator == "trivial":
+            continue
         trajs_est = np.array(
             [
                 np.load(os.path.join("data", "estimate", estimator, "traj", f"{i}.npy"))
@@ -152,10 +154,14 @@ def mass_error() -> None:
 
         df[estimator] = (trajs_est, converge)
 
+    df_err = [pd.DataFrame({}) for _ in range(dim_state)]
+
     def error(all: bool) -> None:
         errs = {}
 
         for estimator in ESTIMATORS:
+            if estimator == "trivial":
+                continue
             if all:
                 errs[estimator] = np.std(trajs - df[estimator][0], axis=0)
             else:
@@ -168,6 +174,8 @@ def mass_error() -> None:
         for i in range(dim_state):
             plt.figure(figsize=(20, 10))
             for estimator in ESTIMATORS:
+                if estimator == "trivial":
+                    continue
                 plt.plot(
                     t,
                     errs[estimator][:, i],
@@ -178,6 +186,7 @@ def mass_error() -> None:
             if not os.path.exists(dname):
                 os.makedirs(dname)
             plt.savefig(os.path.join(dname, f"{i}.png"))
+            plt.clf()
 
     error(False)
     error(True)
