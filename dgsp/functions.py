@@ -15,7 +15,7 @@ l = 0.1
 u1 = 3.0
 u2 = 0.0
 
-initial = np.array([0.0, 0.0, 0.0, 0.0])
+initial = np.array([0.0, 0.0, np.pi / 4, 0.0])
 
 
 sp_transition = sp.Matrix(
