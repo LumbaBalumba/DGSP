@@ -154,8 +154,6 @@ def mass_error() -> None:
 
         df[estimator] = (trajs_est, converge)
 
-    df_err = [pd.DataFrame({}) for _ in range(dim_state)]
-
     def error(all: bool) -> None:
         errs = {}
 
@@ -190,6 +188,41 @@ def mass_error() -> None:
 
     error(False)
     error(True)
+
+    def diverge_percent() -> None:
+        div = [
+            (1 - np.mean(df[estimator][1]) * 100)
+            for estimator in ESTIMATORS
+            if estimator != "trivial"
+        ]
+        df_div = pd.DataFrame(
+            {
+                "estimator": [
+                    estimator for estimator in ESTIMATORS if estimator != "trivial"
+                ],
+                "divergence": div,
+            }
+        )
+        df_div.to_csv(os.path.join("stats", "diverge.csv"), index=False)
+
+    diverge_percent()
+
+    def point_error(idx: int) -> None:
+        t_points = np.linspace(0, T_MAX, int(np.ceil(T_MAX / dt_pred)))
+        indices = [len(t_points) // 7 * i for i in range(1, 7, 2)]
+        indices = [i in indices for i in range(len(t_points))]
+        trajs_idx = trajs[:, :, idx]
+        df_err = pd.DataFrame({"t": t_points[indices]})
+        for estimator in ESTIMATORS:
+            if estimator == "trivial":
+                continue
+            err = np.mean(np.abs(df[estimator][0][:, :, idx] - trajs_idx), axis=0)
+            df_err[estimator] = err[indices]
+
+        df_err.to_csv(os.path.join("stats", f"error_{idx}.csv"), index=False)
+
+    for i in range(dim_state):
+        point_error(i)
 
 
 def stats() -> None:
