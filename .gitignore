@@ -6,3 +6,9 @@ stats
 img
 indent.log
 poetry.lock
+**/*.aux
+**/*.fls
+**/*.log
+**/*.out
+**/*.toc
+**/*.fdb_latexmk

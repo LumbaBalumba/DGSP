@@ -9,9 +9,17 @@ from scripts import ESTIMATORS, NUM_TRAJECTORIES, T_MAX, dt_pred
 
 
 def example() -> None:
-    example_traj_num = 0
+    example_traj_num = 2
 
     traj = np.load(os.path.join("data", "traj", f"{example_traj_num}.npy"))
+
+    x, y = traj[:, 0], traj[:, 1]
+    plt.figure(figsize=(20, 10))
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.plot(x, y)
+    plt.savefig(os.path.join("img", "traj.png"))
+    plt.clf()
 
     t = np.linspace(0, T_MAX, int(np.ceil(T_MAX / dt_pred)))
     traj = traj[:: len(traj) // len(t)][: len(t)]
@@ -65,7 +73,9 @@ def example() -> None:
         df = pd.read_csv(os.path.join("stats", f"example_x_{i}.csv"))
 
         plt.figure(figsize=(20, 10))
-        plt.plot(df["t"], df["x"], label=True)
+        plt.xlabel("Время")
+        plt.ylabel("Состояние")
+        plt.plot(df["t"], df["x"], label="True")
         for estimator in ESTIMATORS:
             plt.plot(df["t"], df[estimator], label=estimator.upper())
         plt.legend()
@@ -87,6 +97,8 @@ def example() -> None:
 
         plt.figure(figsize=(20, 10))
         for estimator in ESTIMATORS:
+            plt.xlabel("Время")
+            plt.ylabel("СКО")
             t = df_x["t"]
             err = df_x[estimator] - df_x["x"]
             sigma = df_k[estimator] ** 0.5
@@ -174,6 +186,8 @@ def mass_error() -> None:
             for estimator in ESTIMATORS:
                 if estimator == "trivial":
                     continue
+                plt.xlabel("Время")
+                plt.ylabel("Средняя ошибка")
                 plt.plot(
                     t,
                     errs[estimator][:, i],
@@ -198,7 +212,9 @@ def mass_error() -> None:
         df_div = pd.DataFrame(
             {
                 "estimator": [
-                    estimator for estimator in ESTIMATORS if estimator != "trivial"
+                    estimator.upper()
+                    for estimator in ESTIMATORS
+                    if estimator != "trivial"
                 ],
                 "divergence": np.round(div, 2),
             }
@@ -208,7 +224,7 @@ def mass_error() -> None:
     diverge_percent()
 
     def point_error(idx: int) -> None:
-        t_points = np.linspace(0, T_MAX, int(np.ceil(T_MAX / dt_pred)))
+        t_points = np.round(np.linspace(0, T_MAX, int(np.ceil(T_MAX / dt_pred))), 2)
         indices = [len(t_points) // 7 * i for i in range(1, 7, 2)]
         indices = [i in indices for i in range(len(t_points))]
         trajs_idx = trajs[:, :, idx]
@@ -217,7 +233,7 @@ def mass_error() -> None:
             if estimator == "trivial":
                 continue
             err = np.mean(np.abs(df[estimator][0][:, :, idx] - trajs_idx), axis=0)
-            df_err[estimator] = err[indices]
+            df_err[estimator] = np.round(err[indices], 5)
 
         df_err.to_csv(os.path.join("stats", f"error_{idx}.csv"), index=False)
 
