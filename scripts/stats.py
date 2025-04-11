@@ -147,7 +147,7 @@ def mass_error() -> None:
 
         converge = np.array(
             [
-                (np.abs(trajs[i] - trajs_est[i]) < std).all()
+                (np.abs(trajs[i] - trajs_est[i]) < 5 * std).all()
                 for i in range(NUM_TRAJECTORIES)
             ]
         )
@@ -191,7 +191,7 @@ def mass_error() -> None:
 
     def diverge_percent() -> None:
         div = [
-            (1 - np.mean(df[estimator][1]) * 100)
+            (1 - np.mean(df[estimator][1])) * 100
             for estimator in ESTIMATORS
             if estimator != "trivial"
         ]
