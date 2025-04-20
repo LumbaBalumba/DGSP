@@ -4,9 +4,6 @@ from scipy.stats import multivariate_normal as norm
 from filterpy.monte_carlo import systematic_resample
 
 from dgsp.estimators.monte_carlo.base import MonteCarloFilter
-from dgsp.functions import (
-    observation,
-)
 
 
 class ParticleFilter(MonteCarloFilter):
@@ -28,7 +25,7 @@ class ParticleFilter(MonteCarloFilter):
     @override
     def update(self, data: np.ndarray) -> None:
         observations_est = np.apply_along_axis(
-            lambda x: observation(x, self.time), arr=self.particles, axis=1
+            lambda x: self.observation(x), arr=self.particles, axis=1
         )
 
         likelihood = norm(mean=data, cov=self.R).pdf(observations_est)
