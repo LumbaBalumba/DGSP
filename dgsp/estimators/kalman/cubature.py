@@ -7,7 +7,6 @@ from dgsp.estimators.base import Estimator
 from dgsp.functions import (
     transition,
     observation,
-    initial,
     dim_state,
     dim_observation,
 )
@@ -32,8 +31,10 @@ class CubatureKalmanFilter(Estimator):
             fx=fx,
             hx=hx,
         )
-
-        self.kf.x = initial
+        self.kf.x = self.state[0]
+        self.kf.P = self.P
+        self.kf.Q = self.Q
+        self.kf.R = self.R
 
     @override
     def predict(self) -> None:

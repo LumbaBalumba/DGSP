@@ -1,6 +1,6 @@
 import numpy as np
 
-from dgsp.functions import initial, Q, R, P
+from dgsp.functions import initial_guess, Q, R, P
 from scripts import dt_sim, dt_pred
 
 
@@ -21,7 +21,7 @@ class Estimator:
         self.R = R * (dt_pred / dt_sim)
         self.P = P * (dt_pred / dt_sim)
         self.dt = dt
-        self.state = [initial]
+        self.state = [initial_guess]
         self.k = [self.P]
         self.time = 0.0
 
