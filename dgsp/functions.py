@@ -1,6 +1,5 @@
 import numpy as np
 import sympy as sp
-import numba
 
 
 x1, x2, theta, phi = sp.symbols(r"x_1 x_2 \theta \phi")
@@ -9,8 +8,8 @@ x = sp.Matrix([x1, x2, theta, phi])
 
 
 Q = np.diag([3e-3, 3e-3, 3e-1, 3e-1]) / 1e4
+P = np.eye(4) * 3e-2
 R = np.eye(2) / 1e3 * 5
-P = np.eye(4) * 0.2
 
 l = 0.1
 u1 = 3.0
@@ -39,7 +38,7 @@ dim_observation = sp_observation.shape[0]
 
 def prettify(func):
     func_c = sp.lambdify([*x, t], func)
-    return lambda x, t: func_c(*x, t).reshape((-1))
+    return lambda x, t: np.squeeze(func_c(*x, t))
 
 
 transition = prettify(sp_transition)
