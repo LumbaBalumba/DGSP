@@ -10,6 +10,7 @@ x = sp.Matrix([x1, x2, theta, phi])
 
 Q = np.diag([3e-3, 3e-3, 3e-1, 3e-1]) / 1e4
 R = np.eye(2) / 1e3 * 5
+P = np.eye(4) * 0.2
 
 l = 0.1
 u1 = 3.0

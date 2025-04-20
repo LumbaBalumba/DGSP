@@ -5,8 +5,6 @@ from filterpy.kalman import UnscentedKalmanFilter as UKF, MerweScaledSigmaPoints
 
 from dgsp.estimators.base import Estimator
 from dgsp.functions import (
-    Q,
-    R,
     transition,
     observation,
     initial,
@@ -38,10 +36,6 @@ class UnscentedKalmanFilter(Estimator):
             points=points,
         )
         self.kf.x = initial
-        self.kf.P *= 0.2
-
-        self.kf.Q = self.Q
-        self.kf.R = self.R
 
     @override
     def predict(self) -> None:

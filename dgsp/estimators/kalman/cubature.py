@@ -34,10 +34,6 @@ class CubatureKalmanFilter(Estimator):
         )
 
         self.kf.x = initial
-        self.kf.P *= 0.3
-
-        self.kf.Q = self.Q
-        self.kf.R = self.R
 
     @override
     def predict(self) -> None:
