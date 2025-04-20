@@ -45,8 +45,10 @@ class Estimator:
     def observation_noise(self) -> np.ndarray:
         return observation_noise(self.time) * dt_pred / dt_sim
 
-    def transition(self, x: np.ndarray) -> np.ndarray:
-        return transition(x, self.time) * self.dt + x
+    def transition(self, x: np.ndarray, dt: float | None = None) -> np.ndarray:
+        if dt is None:
+            dt = self.dt
+        return transition(x, self.time) * dt + x
 
     def observation(self, x: np.ndarray) -> np.ndarray:
         return observation(x, self.time)
