@@ -9,7 +9,6 @@ from dgsp.functions import (
     transition,
     observation,
     transition_noise,
-    dim_state,
 )
 
 
@@ -22,7 +21,7 @@ class ParticleFilter(Estimator):
         super().__init__(dt)
         self.n_particles = n_particles
         self.particles = np.random.multivariate_normal(
-            mean=initial, cov=0.3 * np.eye(dim_state), size=self.n_particles
+            mean=initial, cov=self.P, size=self.n_particles
         )
         self.weights = np.ones(n_particles) / n_particles
         self.n_eff = self.n_particles // 2
@@ -36,10 +35,7 @@ class ParticleFilter(Estimator):
             self.particles[i] += transition_noise()
 
         state_est = np.average(self.particles, weights=self.weights, axis=0)
-        k_est = np.diag(
-            np.average((state_est - self.particles) ** 2, weights=self.weights, axis=0)
-        )
-
+        k_est = np.cov(self.particles, rowvar=False, ddof=1, aweights=self.weights)
         self.state.append(state_est)
         self.k.append(k_est)
         return super().predict()
