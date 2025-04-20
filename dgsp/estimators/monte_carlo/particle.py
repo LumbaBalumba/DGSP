@@ -3,42 +3,20 @@ import numpy as np
 from scipy.stats import multivariate_normal as norm
 from filterpy.monte_carlo import systematic_resample
 
-from dgsp.estimators.base import Estimator
+from dgsp.estimators.monte_carlo.base import MonteCarloFilter
 from dgsp.functions import (
-    initial,
-    transition,
     observation,
-    transition_noise,
 )
 
 
-class ParticleFilter(Estimator):
+class ParticleFilter(MonteCarloFilter):
     n_particles: int
     particles: np.ndarray
     weights: np.ndarray
 
-    def __init__(self, dt: float, n_particles: int = 1000, bootstrap=False) -> None:
-        super().__init__(dt)
-        self.n_particles = n_particles
-        self.particles = np.random.multivariate_normal(
-            mean=initial, cov=self.P, size=self.n_particles
-        )
-        self.weights = np.ones(n_particles) / n_particles
+    def __init__(self, n_particles: int = 1000, bootstrap=False) -> None:
+        super().__init__(n_particles)
         self.n_eff = self.n_particles // 2
-
-    @override
-    def predict(self) -> None:
-        self.particles += self.dt * np.apply_along_axis(
-            lambda x: transition(x, self.time), arr=self.particles, axis=1
-        )
-        for i in range(self.n_particles):
-            self.particles[i] += transition_noise()
-
-        state_est = np.average(self.particles, weights=self.weights, axis=0)
-        k_est = np.cov(self.particles, rowvar=False, ddof=1, aweights=self.weights)
-        self.state.append(state_est)
-        self.k.append(k_est)
-        return super().predict()
 
     def resample(self) -> None:
         indices = systematic_resample(self.weights)

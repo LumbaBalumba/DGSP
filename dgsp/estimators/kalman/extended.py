@@ -12,8 +12,8 @@ from dgsp.estimators.base import Estimator
 
 class ExtendedKalmanFilter(Estimator):
 
-    def __init__(self, dt: float, order: int = 1, square_root: bool = False) -> None:
-        super().__init__(dt)
+    def __init__(self, order: int = 1, square_root: bool = False) -> None:
+        super().__init__()
         self.x = self.state[-1].copy()
 
     def predict(self) -> None:

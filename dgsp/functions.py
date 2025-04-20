@@ -48,14 +48,14 @@ observation = prettify(sp_observation)
 observation_j = prettify(sp_observation_j)
 
 
-def transition_noise() -> np.ndarray:
+def transition_noise(t: float) -> np.ndarray:
     noise = np.empty(dim_state)
     for i in range(dim_state):
         noise[i] = np.random.normal(0, Q[i, i] ** 0.5)
     return noise
 
 
-def observation_noise() -> np.ndarray:
+def observation_noise(t: float) -> np.ndarray:
     noise = np.empty(dim_observation)
     for i in range(dim_observation):
         noise[i] = np.random.normal(0, R[i, i] ** 0.5)

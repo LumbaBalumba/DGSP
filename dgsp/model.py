@@ -28,9 +28,13 @@ class RobotSystem:
     def step(self) -> None:
         old_state = self.trajectory[-1]
         new_state = (
-            old_state + transition(old_state, self.time) * self.dt + transition_noise()
+            old_state
+            + transition(old_state, self.time) * self.dt
+            + transition_noise(self.time)
         )
-        new_measurement = observation(new_state, self.time) + observation_noise()
+        new_measurement = observation(new_state, self.time) + observation_noise(
+            self.time
+        )
         self.trajectory.append(new_state)
         self.measurements.append(new_measurement)
         self.time += self.dt

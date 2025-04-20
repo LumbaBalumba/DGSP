@@ -1,40 +1,34 @@
+from typing_extensions import override
 import numpy as np
 
+from dgsp.estimators.monte_carlo.base import MonteCarloFilter
 from dgsp.functions import (
-    observation_noise,
     transition,
     observation,
     initial_guess,
     dim_state,
     dim_observation,
-    transition_noise,
 )
-from dgsp.estimators.base import Estimator
 
 
-class MinMaxFilter(Estimator):
-
-    def __init__(self, dt: float, n_particles: int = 1000) -> None:
-        super().__init__(dt)
-
-        self.n_particles = n_particles
-        self.particles = np.random.multivariate_normal(
-            mean=initial_guess, cov=self.P, size=self.n_particles
-        )
+class MinMaxFilter(MonteCarloFilter):
+    def __init__(self, n_particles: int = 1000) -> None:
+        super().__init__(n_particles)
 
         self._m_x = initial_guess.copy()
         self._m_z = observation(initial_guess, self.time)
         self._R_xy = np.zeros((dim_state, dim_observation))
         self._R_yy = np.eye(dim_observation)
 
+    @override
     def predict(self) -> None:
         for i in range(self.n_particles):
             self.particles[i] += transition(self.particles[i], self.time)
-            self.particles[i] += transition_noise()
+            self.particles[i] += self.transition_noise()
 
         obs_syn = np.array(
             [
-                observation(particle, self.time) + observation_noise()
+                observation(particle, self.time) + self.observation_noise()
                 for particle in self.particles
             ]
         )
@@ -57,6 +51,7 @@ class MinMaxFilter(Estimator):
 
         return super().predict()
 
+    @override
     def update(self, data: np.ndarray) -> None:
         K = self._R_xy @ np.linalg.inv(self._R_yy)
 

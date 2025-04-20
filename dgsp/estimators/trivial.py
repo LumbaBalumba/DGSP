@@ -11,10 +11,9 @@ class TrivialEstimator(Estimator):
 
     def __init__(
         self,
-        dt: float,
         all_traj: np.ndarray,
     ) -> None:
-        super().__init__(dt)
+        super().__init__()
         self.traj = np.mean(all_traj, axis=0)
         self.var = np.var(all_traj, axis=0)
 

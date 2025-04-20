@@ -52,33 +52,33 @@ def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
 def estimate_all(estimator_type: str, parallel: bool = True) -> None:
     match estimator_type:
         case "ekf":
-            estimator = ExtendedKalmanFilter(dt_pred)
+            estimator = ExtendedKalmanFilter()
         case "ekfr":
-            estimator = ExtendedKalmanFilter(dt_pred, square_root=True)
+            estimator = ExtendedKalmanFilter(square_root=True)
         case "ekf2":
-            estimator = ExtendedKalmanFilter(dt_pred, order=2)
+            estimator = ExtendedKalmanFilter(order=2)
         case "ekf2r":
-            estimator = ExtendedKalmanFilter(dt_pred, order=2, square_root=True)
+            estimator = ExtendedKalmanFilter(order=2, square_root=True)
         case "ukf":
-            estimator = UnscentedKalmanFilter(dt_pred)
+            estimator = UnscentedKalmanFilter()
         case "ukfr":
-            estimator = UnscentedKalmanFilter(dt_pred, square_root=True)
+            estimator = UnscentedKalmanFilter(square_root=True)
         case "ckf":
-            estimator = CubatureKalmanFilter(dt_pred)
+            estimator = CubatureKalmanFilter()
         case "ckfr":
-            estimator = CubatureKalmanFilter(dt_pred, square_root=True)
+            estimator = CubatureKalmanFilter(square_root=True)
         case "trivial":
             all_traj = [
                 np.load(os.path.join("data", "traj", f"{i}.npy"))
                 for i in range(NUM_TRAJECTORIES)
             ]
-            estimator = TrivialEstimator(dt_pred, np.array(all_traj))
+            estimator = TrivialEstimator(np.array(all_traj))
         case "pf":
-            estimator = ParticleFilter(dt_pred, 1000)
+            estimator = ParticleFilter(1000)
         case "pfb":
-            estimator = ParticleFilter(dt_pred, 1000, bootstrap=True)
+            estimator = ParticleFilter(1000, bootstrap=True)
         case "cmnf":
-            estimator = MinMaxFilter(dt_pred, 1000)
+            estimator = MinMaxFilter(1000)
         case _:
             raise RuntimeError(f"Invalid estimator type: {estimator_type}")
 
