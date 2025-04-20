@@ -38,7 +38,7 @@ dim_observation = sp_observation.shape[0]
 
 
 def prettify(func):
-    func_c = numba.njit()(sp.lambdify([*x, t], func))
+    func_c = sp.lambdify([*x, t], func)
     return lambda x, t: func_c(*x, t).reshape((-1))
 
 
@@ -49,7 +49,6 @@ observation = prettify(sp_observation)
 observation_j = prettify(sp_observation_j)
 
 
-@numba.njit()
 def transition_noise() -> np.ndarray:
     noise = np.empty(dim_state)
     for i in range(dim_state):
@@ -57,7 +56,6 @@ def transition_noise() -> np.ndarray:
     return noise
 
 
-@numba.njit()
 def observation_noise() -> np.ndarray:
     noise = np.empty(dim_observation)
     for i in range(dim_observation):

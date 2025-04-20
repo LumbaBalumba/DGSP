@@ -13,7 +13,14 @@ from dgsp.estimators import (
     ParticleFilter,
     MinMaxFilter,
 )
-from scripts import ESTIMATORS, dt_pred, dt_obs, dt_sim, NUM_TRAJECTORIES
+from scripts import (
+    ENABLE_PARALLEL,
+    ESTIMATORS,
+    dt_pred,
+    dt_obs,
+    dt_sim,
+    NUM_TRAJECTORIES,
+)
 
 
 def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
@@ -85,7 +92,7 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
             estimate_one(idx, deepcopy(estimator), estimator_type)
 
 
-def estimate(parallel: bool = True) -> None:
+def estimate(parallel: bool = ENABLE_PARALLEL) -> None:
     for estimator_type in ESTIMATORS:
         print(f"Running {estimator_type} estimator")
         estimate_all(estimator_type, parallel)
