@@ -1,6 +1,15 @@
 import numpy as np
 
-from dgsp.functions import initial_guess, Q, R, P, observation_noise, transition_noise
+from dgsp.functions import (
+    initial_guess,
+    Q,
+    R,
+    P,
+    observation_noise,
+    transition_noise,
+    transition,
+    observation,
+)
 from scripts import dt_sim, dt_pred
 
 
@@ -19,7 +28,7 @@ class Estimator:
         self.dt = dt_pred
         self.Q = Q * (self.dt / dt_sim)
         self.R = R * (self.dt / dt_sim)
-        self.P = P * (self.dt / dt_sim)
+        self.P = P
         self.state = [initial_guess]
         self.k = [self.P]
         self.time = 0.0
@@ -35,3 +44,9 @@ class Estimator:
 
     def observation_noise(self) -> np.ndarray:
         return observation_noise(self.time) * dt_pred / dt_sim
+
+    def transition(self, x: np.ndarray) -> np.ndarray:
+        return transition(x, self.time) * self.dt + x
+
+    def observation(self, x: np.ndarray) -> np.ndarray:
+        return observation(x, self.time)

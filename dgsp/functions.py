@@ -8,7 +8,7 @@ x = sp.Matrix([x1, x2, theta, phi])
 
 
 Q = np.diag([3e-3, 3e-3, 3e-1, 3e-1]) / 1e4
-P = np.eye(4) * 3e-2
+P = np.eye(4) * 3e-1
 R = np.eye(2) / 1e3 * 5
 
 l = 0.1
@@ -49,14 +49,10 @@ observation_j = prettify(sp_observation_j)
 
 
 def transition_noise(t: float) -> np.ndarray:
-    noise = np.empty(dim_state)
-    for i in range(dim_state):
-        noise[i] = np.random.normal(0, Q[i, i] ** 0.5)
+    noise = np.random.multivariate_normal(mean=np.zeros(dim_state), cov=Q)
     return noise
 
 
 def observation_noise(t: float) -> np.ndarray:
-    noise = np.empty(dim_observation)
-    for i in range(dim_observation):
-        noise[i] = np.random.normal(0, R[i, i] ** 0.5)
+    noise = np.random.multivariate_normal(mean=np.zeros(dim_observation), cov=R)
     return noise

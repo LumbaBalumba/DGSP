@@ -6,17 +6,7 @@ dt_obs = dt_pred * 10
 NUM_TRAJECTORIES = 10
 
 ESTIMATORS = [
-    "trivial",
-    "ekf",
-    "ekfr",
-    "ekf2",
-    "ekf2r",
-    "ckf",
-    "ckfr",
-    "ukf",
-    "ukfr",
     "pf",
-    "pfb",
 ]
 
 ENABLE_PARALLEL = True
