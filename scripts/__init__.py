@@ -16,7 +16,7 @@ ESTIMATORS = [
     "ukf",
     "ukfr",
     "pf",
-    "pf_boot",
+    "pfb",
 ]
 
 ENABLE_PARALLEL = True
