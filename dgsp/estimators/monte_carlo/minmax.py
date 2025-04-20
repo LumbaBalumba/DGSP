@@ -13,11 +13,11 @@ from dgsp.functions import (
 
 class MinMaxFilter(MonteCarloFilter):
     def __init__(self, n_particles: int = 1000) -> None:
+        super().__init__(n_particles)
         self._m_x = initial_guess.copy()
         self._m_z = observation(initial_guess, self.time)
         self._R_xy = np.zeros((dim_state, dim_observation))
         self._R_yy = np.eye(dim_observation)
-        super().__init__(n_particles)
 
     @override
     def predict(self) -> None:
