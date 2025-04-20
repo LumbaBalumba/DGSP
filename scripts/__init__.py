@@ -5,6 +5,6 @@ dt_obs = dt_pred * 10
 
 NUM_TRAJECTORIES = 10
 
-ESTIMATORS = ["cmnf"]
+ESTIMATORS = ["ekf"]
 
 ENABLE_PARALLEL = True

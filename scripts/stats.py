@@ -5,11 +5,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from dgsp.functions import dim_state
-from scripts import ESTIMATORS, NUM_TRAJECTORIES, T_MAX, dt_pred
+from scripts import ESTIMATORS, NUM_TRAJECTORIES, T_MAX, dt_pred, dt_sim
 
 
 def example() -> None:
-    example_traj_num = 2
+    example_traj_num = 0
 
     traj = np.load(os.path.join("data", "traj", f"{example_traj_num}.npy"))
 
@@ -18,6 +18,10 @@ def example() -> None:
     plt.xlabel("x")
     plt.ylabel("y")
     plt.plot(x, y)
+
+    if not os.path.exists("img"):
+        os.makedirs("img")
+
     plt.savefig(os.path.join("img", "traj.png"))
     plt.clf()
 
@@ -50,7 +54,9 @@ def example() -> None:
     for component in range(dim_state):
         x = traj[:, component]
         x_est = [traj_est[:, component][: len(x)] for traj_est in traj_estimates]
-        std_est = [k_est[:, component, component][: len(x)] for k_est in k_estimates]
+        std_est = [
+            k_est[:, component, component][: len(x)] ** 0.5 for k_est in k_estimates
+        ]
 
         df_x = pd.DataFrame(
             {
@@ -103,6 +109,14 @@ def example() -> None:
             err = df_x[estimator] - df_x["x"]
             sigma = df_k[estimator] ** 0.5
 
+            std = np.std(
+                np.array(
+                    [np.load(f"data/traj/{i}.npy") for i in range(NUM_TRAJECTORIES)]
+                ),
+                axis=0,
+            )
+            std = std[:: len(std) // len(t)][: len(t)]
+
             plt.plot(
                 t,
                 err,
@@ -141,8 +155,8 @@ def mass_error() -> None:
             for i in range(NUM_TRAJECTORIES)
         ]
     )
+    trajs = trajs[:, :: int(np.ceil(dt_pred / dt_sim)), :]
     trajs = trajs[:, : len(t), :]
-    std = trajs.std(axis=0)
 
     df = {}
 
@@ -154,14 +168,19 @@ def mass_error() -> None:
                 np.load(os.path.join("data", "estimate", estimator, "traj", f"{i}.npy"))
                 for i in range(NUM_TRAJECTORIES)
             ]
-        )
-        trajs_est = trajs_est[:, : len(t), :]
+        )[:, : len(t), :]
 
-        converge = np.array(
+        k_est = np.array(
             [
-                (np.abs(trajs[i] - trajs_est[i]) < 5 * std).all()
+                np.load(os.path.join("data", "estimate", estimator, "k", f"{i}.npy"))
                 for i in range(NUM_TRAJECTORIES)
             ]
+        )[:, : len(t), :, :]
+
+        std = np.diagonal(k_est, axis1=2, axis2=3) ** 0.5
+
+        converge = np.all(
+            np.mean(np.abs(trajs - trajs_est) < 5 * std, axis=1) >= 0.95, axis=1
         )
 
         df[estimator] = (trajs_est, converge)
