@@ -3,6 +3,7 @@ from copy import deepcopy
 
 from joblib import Parallel, delayed
 import numpy as np
+import cupy as cp
 
 from dgsp.estimators import (
     Estimator,
@@ -16,6 +17,8 @@ from dgsp.estimators import (
 from scripts import (
     ENABLE_PARALLEL,
     ESTIMATORS,
+    MONTE_CARLO_BACKEND,
+    MONTE_CARLO_NUM_PARTICLES,
     dt_pred,
     dt_obs,
     dt_sim,
@@ -26,10 +29,14 @@ from scripts import (
 def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
     obs = np.load(os.path.join("data", "obs", f"{traj_n}.npy"))
 
+    if estimator.backend_type == "cupy":
+        obs = cp.asarray(obs)
+
     pred_step = int(dt_pred / dt_sim)
     correct_step = int(dt_obs / dt_sim)
 
     for i in range(0, len(obs), pred_step):
+        print(i)
         estimator.predict()
         if i % correct_step == 0:
             estimator.update(obs[i])
@@ -42,10 +49,14 @@ def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
 
     if not os.path.exists(new_path_traj):
         os.makedirs(new_path_traj)
+    if estimator.backend_type == "cupy":
+        traj_est = cp.asnumpy(traj_est)
     np.save(os.path.join(new_path_traj, f"{traj_n}.npy"), traj_est)
 
     if not os.path.exists(new_path_k):
         os.makedirs(new_path_k)
+    if estimator.backend_type == "cupy":
+        k_est = cp.asnumpy(k_est)
     np.save(os.path.join(new_path_k, f"{traj_n}.npy"), k_est)
 
 
@@ -74,11 +85,13 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
             ]
             estimator = TrivialEstimator(np.array(all_traj))
         case "pf":
-            estimator = ParticleFilter(1000)
+            estimator = ParticleFilter(MONTE_CARLO_NUM_PARTICLES, MONTE_CARLO_BACKEND)
         case "pfb":
-            estimator = ParticleFilter(1000, bootstrap=True)
+            estimator = ParticleFilter(
+                MONTE_CARLO_NUM_PARTICLES, MONTE_CARLO_BACKEND, bootstrap=True
+            )
         case "cmnf":
-            estimator = MinMaxFilter(1000)
+            estimator = MinMaxFilter(MONTE_CARLO_NUM_PARTICLES, MONTE_CARLO_BACKEND)
         case _:
             raise RuntimeError(f"Invalid estimator type: {estimator_type}")
 

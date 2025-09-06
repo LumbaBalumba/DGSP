@@ -1,12 +1,11 @@
 import numpy as np
 
 from dgsp.functions import (
-    transition,
+    transition_cpu,
     transition_noise,
-    observation,
+    observation_cpu,
     observation_noise,
     initial,
-    dim_state,
 )
 
 
@@ -19,9 +18,9 @@ class RobotSystem:
     init: np.ndarray = np.array(initial, dtype=float)
 
     def __init__(self, dt: float, t_max: float) -> None:
-        self.trajectory = [np.random.normal(self.init, 0.3 * np.ones(dim_state))]
+        self.trajectory = [initial]
         self.time = 0.0
-        self.measurements = [observation(self.trajectory[0], self.time)]
+        self.measurements = [observation_cpu(self.trajectory[0], self.time)]
         self.dt = dt
         self.t_max = t_max
 
@@ -29,10 +28,10 @@ class RobotSystem:
         old_state = self.trajectory[-1]
         new_state = (
             old_state
-            + transition(old_state, self.time) * self.dt
+            + transition_cpu(old_state, self.time) * self.dt
             + transition_noise(self.time)
         )
-        new_measurement = observation(new_state, self.time) + observation_noise(
+        new_measurement = observation_cpu(new_state, self.time) + observation_noise(
             self.time
         )
         self.trajectory.append(new_state)

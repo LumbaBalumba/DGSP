@@ -1,58 +1,81 @@
 import numpy as np
 import sympy as sp
+import cupy as cp
+import warnings
 
+warnings.filterwarnings("ignore")
 
-x1, x2, theta, phi = sp.symbols(r"x_1 x_2 \theta \phi")
+x = sp.IndexedBase("x")
 t = sp.Symbol("t")
-x = sp.Matrix([x1, x2, theta, phi])
 
+# Код для редактирования под вашу статью начинается здесь
+###########################################################################
+dim_state = 6
+dim_observation = 2
 
-Q = np.diag([3e-3, 3e-3, 3e-1, 3e-1]) / 1e4
-P = np.eye(4) * 3e-1
+Q = np.diag(np.array([3e-3, 3e-3, 3e-1, 3e-1, 0, 0])) / 1e4
+P = np.diag([3e-1, 3e-1, 3e-1, 3e-1, 0.0, 0.0])
 R = np.eye(2) / 1e3 * 5
 
 l = 0.1
-u1 = 3.0
-u2 = 0.0
-
-initial = np.array([0.0, 0.0, np.pi / 4, 0.0])
-initial_guess = initial
 
 
-sp_transition = sp.Matrix(
-    [
-        sp.cos(theta) * sp.cos(phi) * u1,
-        sp.sin(theta) * sp.cos(phi) * u1,
-        sp.sin(phi) * u1 / l,
-        u2,
+def transition(x):
+    return [
+        sp.cos(x[2]) * sp.cos(x[3]) * x[4],
+        sp.sin(x[2]) * sp.cos(x[3]) * x[4],
+        sp.sin(x[3]) * x[4] / l,
+        x[5],
+        x[4],
+        x[5],
     ]
-)
-sp_transition_j = sp_transition.jacobian(x)
-
-sp_observation = sp.Matrix([(x1**2 + x2**2) ** 0.5, sp.atan2(x2, x1)])
-sp_observation_j = sp_observation.jacobian(x)
-
-dim_state = sp_transition.shape[0]
-dim_observation = sp_observation.shape[0]
 
 
-def prettify(func):
-    func_c = sp.lambdify([*x, t], func)
-    return lambda x, t: np.squeeze(func_c(*x, t))
+def observation(x):
+    return [(x[0] ** 2 + x[1] ** 2) ** 0.5, sp.atan2(x[1], x[0])]
 
 
-transition = prettify(sp_transition)
-transition_j = prettify(sp_transition_j)
+initial = np.array([0.0, 0.0, np.pi / 4, 0.0, 3.0, 0.0])
+initial_guess = initial
+###########################################################################
 
-observation = prettify(sp_observation)
-observation_j = prettify(sp_observation_j)
+sp_transition = sp.Matrix(transition(x))
+
+sp_transition_j = sp_transition.jacobian([x[i] for i in range(dim_state)])
+
+sp_observation = sp.Matrix(observation(x))
+sp_observation_j = sp_observation.jacobian([x[i] for i in range(dim_state)])
 
 
-def transition_noise(t: float) -> np.ndarray:
-    noise = np.random.multivariate_normal(mean=np.zeros(dim_state), cov=Q)
+def prettify(func, backend="numpy"):
+    F_raw = sp.lambdify((x, t), func, backend)
+    return lambda x, t: F_raw(x, t).reshape(-1)
+
+
+transition_cpu = prettify(sp_transition)
+transition_cpu_j = prettify(sp_transition_j)
+
+transition_gpu = prettify(sp_transition, "cupy")
+transition_gpu_j = prettify(sp_transition_j, "cupy")
+
+observation_cpu = prettify(sp_observation)
+observation_cpu_j = prettify(sp_observation_j)
+
+observation_gpu = prettify(sp_observation, "cupy")
+observation_gpu_j = prettify(sp_observation_j, "cupy")
+
+
+def transition_noise(t: float, backend_type: str = "numpy") -> np.ndarray:
+    backend = np if backend_type == "numpy" else cp
+    noise = backend.random.multivariate_normal(
+        mean=backend.zeros(dim_state), cov=backend.asarray(Q)
+    )
     return noise
 
 
-def observation_noise(t: float) -> np.ndarray:
-    noise = np.random.multivariate_normal(mean=np.zeros(dim_observation), cov=R)
+def observation_noise(t: float, backend_type: str = "numpy") -> np.ndarray:
+    backend = np if backend_type == "numpy" else cp
+    noise = backend.random.multivariate_normal(
+        mean=backend.zeros(dim_observation), cov=backend.asarray(R)
+    )
     return noise
