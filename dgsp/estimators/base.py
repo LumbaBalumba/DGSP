@@ -50,11 +50,11 @@ class Estimator:
     def update(self, data: np.ndarray) -> None:
         pass
 
-    def transition_noise(self) -> np.ndarray:
-        return transition_noise(self.time, self.backend_type) * dt_pred / dt_sim
+    def transition_noise(self, size: int = 1) -> np.ndarray:
+        return transition_noise(self.time, size, self.backend_type) * dt_pred / dt_sim
 
-    def observation_noise(self) -> np.ndarray:
-        return observation_noise(self.time, self.backend_type) * dt_pred / dt_sim
+    def observation_noise(self, size: int = 1) -> np.ndarray:
+        return observation_noise(self.time, size, self.backend_type) * dt_pred / dt_sim
 
     def transition(self, x: np.ndarray, dt: float | None = None) -> np.ndarray:
         if dt is None:

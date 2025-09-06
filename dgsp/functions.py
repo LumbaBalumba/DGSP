@@ -13,8 +13,8 @@ t = sp.Symbol("t")
 dim_state = 6
 dim_observation = 2
 
-Q = np.diag(np.array([3e-3, 3e-3, 3e-1, 3e-1, 0, 0])) / 1e4
-P = np.diag([3e-1, 3e-1, 3e-1, 3e-1, 0.0, 0.0])
+Q = np.diag(np.array([3e-3, 3e-3, 3e-1, 3e-1, 1e-4, 1e-4])) / 1e4
+P = np.diag([3e-1, 3e-1, 3e-1, 3e-1, 1e-4, 1e-4])
 R = np.eye(2) / 1e3 * 5
 
 l = 0.1
@@ -65,7 +65,7 @@ observation_gpu = prettify(sp_observation, "cupy")
 observation_gpu_j = prettify(sp_observation_j, "cupy")
 
 
-def transition_noise(t: float, backend_type: str = "numpy") -> np.ndarray:
+def transition_noise(t: float, size=1, backend_type: str = "numpy") -> np.ndarray:
     backend = np if backend_type == "numpy" else cp
     noise = backend.random.multivariate_normal(
         mean=backend.zeros(dim_state), cov=backend.asarray(Q)
@@ -73,7 +73,7 @@ def transition_noise(t: float, backend_type: str = "numpy") -> np.ndarray:
     return noise
 
 
-def observation_noise(t: float, backend_type: str = "numpy") -> np.ndarray:
+def observation_noise(t: float, size=1, backend_type: str = "numpy") -> np.ndarray:
     backend = np if backend_type == "numpy" else cp
     noise = backend.random.multivariate_normal(
         mean=backend.zeros(dim_observation), cov=backend.asarray(R)

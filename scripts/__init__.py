@@ -10,7 +10,7 @@ ESTIMATORS = [
     # "ekfr",
     # "ckf",
     # "ckfr",
-    # "ukf",
+    "ukf",
     # "ukfr",
     "pf",
     # "pfb",

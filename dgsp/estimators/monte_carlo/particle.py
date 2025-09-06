@@ -74,7 +74,7 @@ class ParticleFilter(MonteCarloFilter):
 
         n_eff = 1 / backend.sum(self.weights**2)
 
-        # if n_eff < self.n_eff:
-        #     self.resample()
+        if n_eff < self.n_eff:
+            self.resample()
 
         return super().update(data)
