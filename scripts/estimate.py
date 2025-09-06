@@ -36,7 +36,6 @@ def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
     correct_step = int(dt_obs / dt_sim)
 
     for i in range(0, len(obs), pred_step):
-        print(i)
         estimator.predict()
         if i % correct_step == 0:
             estimator.update(obs[i])
