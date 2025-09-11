@@ -64,29 +64,25 @@ class Estimator:
         batched: bool = False,
         dt: float | None = None,
     ) -> np.ndarray:
-        backend = np if self.backend_type == "numpy" else cp
-
         if dt is None:
             dt = self.dt
         if batched:
             dxdt = (
-                self.transition_func(x.T, backend.zeros_like(x.T), self.time)
+                self.transition_func(x.T, self.time)
                 .reshape((dim_state, -1))
                 .T.reshape((-1, dim_state))
             )
         else:
-            dxdt = self.transition_func(x, backend.zeros_like(x), self.time)
+            dxdt = self.transition_func(x, self.time)
         return dxdt * dt + x
 
     def observation(self, x: np.ndarray, batched: bool = False) -> np.ndarray:
-        backend = np if self.backend_type == "numpy" else cp
-
         if batched:
             y = (
-                self.observation_func(x.T, backend.zeros_like(x.T), self.time)
+                self.observation_func(x.T, self.time)
                 .reshape((dim_observation, -1))
                 .T.reshape((-1, dim_observation))
             )
         else:
-            y = self.observation_func(x, backend.zeros_like(x), self.time)
+            y = self.observation_func(x, self.time)
         return y

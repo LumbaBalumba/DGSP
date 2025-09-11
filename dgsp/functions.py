@@ -6,7 +6,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 x = sp.IndexedBase("x")
-w = sp.IndexedBase("w")
+placeholder = sp.Symbol("w")
 t = sp.Symbol("t")
 
 # Код для редактирования под вашу статью начинается здесь
@@ -24,37 +24,39 @@ u1 = 3.0
 u2 = 0.0
 
 
-def transition(x, w):
+def transition(x):
     return [
-        sp.cos(x[2]) * sp.cos(x[3]) * u1 + w[0],
-        sp.sin(x[2]) * sp.cos(x[3]) * u1 + w[1],
-        sp.sin(x[3]) * u1 / L + w[2],
-        u2 + w[3],
+        sp.cos(x[2]) * sp.cos(x[3]) * u1,
+        sp.sin(x[2]) * sp.cos(x[3]) * u1,
+        sp.sin(x[3]) * u1 / L,
+        u2,
     ]
 
 
-def observation(x, w):
-    return [(x[0] ** 2 + x[1] ** 2) ** 0.5 + w[0], sp.atan2(x[1], x[0]) + w[1]]
+def observation(x):
+    return [(x[0] ** 2 + x[1] ** 2) ** 0.5, sp.atan2(x[1], x[0])]
 
 
 initial = np.array([0.0, 0.0, np.pi / 4, 0.0])
 initial_guess = initial
 ###########################################################################
 
-sp_transition = sp.Matrix(transition(x, w))
+sp_transition = sp.Matrix(transition(x)) + sp.Matrix([placeholder] * dim_state)
 sp_transition_j = sp_transition.jacobian(
-    [x[i] for i in range(dim_state)] + [w[i] for i in range(dim_state)]
+    [x[i] for i in range(dim_state)] + [placeholder]
 )
 
-sp_observation = sp.Matrix(observation(x, w))
+sp_observation = sp.Matrix(observation(x)) + sp.Matrix([placeholder] * dim_observation)
 sp_observation_j = sp_observation.jacobian(
-    [x[i] for i in range(dim_state)] + [w[i] for i in range(dim_state)]
+    [x[i] for i in range(dim_state)] + [placeholder]
 )
 
 
 def prettify(func, backend_type="numpy"):
-    F_raw = sp.lambdify((x, w, t), func, backend_type)
-    return lambda x, w, t: F_raw(x, w, t).reshape(-1)
+    F_raw = sp.lambdify((x, placeholder, t), func, backend_type)
+
+    backend = np if backend_type == "numpy" else cp
+    return lambda x, t: F_raw(x, backend.zeros_like(x), t).reshape(-1)
 
 
 transition_cpu = prettify(sp_transition)
