@@ -6,7 +6,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 x = sp.IndexedBase("x")
-placeholder = sp.Symbol("w")
+placeholder = sp.IndexedBase("w")
 t = sp.Symbol("t")
 
 # Код для редактирования под вашу статью начинается здесь
@@ -41,14 +41,18 @@ initial = np.array([0.0, 0.0, np.pi / 4, 0.0])
 initial_guess = initial
 ###########################################################################
 
-sp_transition = sp.Matrix(transition(x)) + sp.Matrix([placeholder] * dim_state)
+sp_transition = sp.Matrix(transition(x)) + sp.Matrix(
+    [placeholder[i] for i in range(dim_state)]
+)
 sp_transition_j = sp_transition.jacobian(
-    [x[i] for i in range(dim_state)] + [placeholder]
+    [x[i] for i in range(dim_state)] + [placeholder[i] for i in range(dim_state)]
 )
 
-sp_observation = sp.Matrix(observation(x)) + sp.Matrix([placeholder] * dim_observation)
+sp_observation = sp.Matrix(observation(x)) + sp.Matrix(
+    [placeholder[i] for i in range(dim_observation)]
+)
 sp_observation_j = sp_observation.jacobian(
-    [x[i] for i in range(dim_state)] + [placeholder]
+    [x[i] for i in range(dim_state)] + [placeholder[i] for i in range(dim_observation)]
 )
 
 
