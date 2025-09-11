@@ -15,7 +15,7 @@ ESTIMATORS = [
     "pf",
     # "pfb",
     # "cmnf",
-    # "trivial",
+    "trivial",
 ]
 MONTE_CARLO_BACKEND = "numpy"  # "numpy" or "cupy"
 MONTE_CARLO_NUM_PARTICLES = 1000
