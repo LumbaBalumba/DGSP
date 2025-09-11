@@ -1,23 +1,23 @@
 T_MAX = 1e0
-dt_sim = 1e-2
+dt_sim = 1e-4
 dt_pred = dt_sim
-dt_obs = dt_pred  # * 10
+dt_obs = dt_pred * 10
 
-NUM_TRAJECTORIES = 1
+NUM_TRAJECTORIES = 10000
 
 ESTIMATORS = [
     # "ekf",
     # "ekfr",
     # "ckf",
     # "ckfr",
-    # "ukf",
+    "ukf",
     # "ukfr",
     "pf",
     # "pfb",
     # "cmnf",
     # "trivial",
 ]
-MONTE_CARLO_BACKEND = "cupy"  # "numpy" or "cupy"
+MONTE_CARLO_BACKEND = "numpy"  # "numpy" or "cupy"
 MONTE_CARLO_NUM_PARTICLES = 1000
 
-ENABLE_PARALLEL = False
+ENABLE_PARALLEL = True

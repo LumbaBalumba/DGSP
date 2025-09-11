@@ -20,7 +20,11 @@ class RobotSystem:
     def __init__(self, dt: float, t_max: float) -> None:
         self.trajectory = [initial]
         self.time = 0.0
-        self.measurements = [observation_cpu(self.trajectory[0], self.time)]
+        self.measurements = [
+            observation_cpu(
+                self.trajectory[0], np.zeros_like(self.trajectory[0]), self.time
+            )
+        ]
         self.dt = dt
         self.t_max = t_max
 
@@ -28,12 +32,12 @@ class RobotSystem:
         old_state = self.trajectory[-1]
         new_state = (
             old_state
-            + transition_cpu(old_state, self.time) * self.dt
+            + transition_cpu(old_state, np.zeros_like(old_state), self.time) * self.dt
             + transition_noise(self.time)
         )
-        new_measurement = observation_cpu(new_state, self.time) + observation_noise(
-            self.time
-        )
+        new_measurement = observation_cpu(
+            new_state, np.zeros_like(new_state), self.time
+        ) + observation_noise(self.time)
         self.trajectory.append(new_state)
         self.measurements.append(new_measurement)
         self.time += self.dt

@@ -12,6 +12,8 @@ from dgsp.functions import (
     observation_cpu,
     transition_gpu,
     observation_gpu,
+    dim_state,
+    dim_observation,
 )
 from scripts import dt_sim, dt_pred
 
@@ -56,10 +58,35 @@ class Estimator:
     def observation_noise(self, size: int = 1) -> np.ndarray:
         return observation_noise(self.time, size, self.backend_type) * dt_pred / dt_sim
 
-    def transition(self, x: np.ndarray, dt: float | None = None) -> np.ndarray:
+    def transition(
+        self,
+        x: np.ndarray,
+        batched: bool = False,
+        dt: float | None = None,
+    ) -> np.ndarray:
+        backend = np if self.backend_type == "numpy" else cp
+
         if dt is None:
             dt = self.dt
-        return self.transition_func(x, self.time) * dt + x
+        if batched:
+            dxdt = (
+                self.transition_func(x.T, backend.zeros_like(x.T), self.time)
+                .reshape((dim_state, -1))
+                .T.reshape((-1, dim_state))
+            )
+        else:
+            dxdt = self.transition_func(x, backend.zeros_like(x), self.time)
+        return dxdt * dt + x
 
-    def observation(self, x: np.ndarray) -> np.ndarray:
-        return self.observation_func(x, self.time)
+    def observation(self, x: np.ndarray, batched: bool = False) -> np.ndarray:
+        backend = np if self.backend_type == "numpy" else cp
+
+        if batched:
+            y = (
+                self.observation_func(x.T, backend.zeros_like(x.T), self.time)
+                .reshape((dim_observation, -1))
+                .T.reshape((-1, dim_observation))
+            )
+        else:
+            y = self.observation_func(x, backend.zeros_like(x), self.time)
+        return y

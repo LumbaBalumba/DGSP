@@ -46,11 +46,7 @@ class ParticleFilter(MonteCarloFilter):
     def update(self, data: np.ndarray) -> None:
         backend = np if self.backend_type == "numpy" else cp
 
-        observations_est = (
-            self.observation(self.particles.T)
-            .reshape((-1, self.n_particles))
-            .T.reshape((self.n_particles, -1))
-        )
+        observations_est = self.observation(self.particles, True)
 
         def normal_pdf(mean, cov, data):
             k = mean.shape[0]

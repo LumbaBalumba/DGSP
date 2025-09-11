@@ -24,11 +24,7 @@ class MonteCarloFilter(Estimator):
     def predict(self) -> None:
         backend = np if self.backend_type == "numpy" else cp
 
-        self.particles = backend.apply_along_axis(
-            lambda x: self.transition(x),
-            arr=self.particles,
-            axis=1,
-        )
+        self.particles = self.transition(self.particles, True)
         self.particles += self.transition_noise(self.n_particles)
 
         state_est = backend.average(self.particles, weights=self.weights, axis=0)
