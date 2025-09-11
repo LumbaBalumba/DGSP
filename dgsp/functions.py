@@ -74,15 +74,27 @@ def transition_noise(
     t: float, size: int = 1, backend_type: str = "numpy"
 ) -> np.ndarray:
     backend = np if backend_type == "numpy" else cp
-    noise = backend.random.multivariate_normal(
-        mean=backend.zeros(dim_state), cov=backend.asarray(Q), size=size
-    )
-    return noise
+
+    if size == 1:
+        return backend.random.multivariate_normal(
+            mean=backend.zeros(dim_state), cov=backend.asarray(Q)
+        )
+    else:
+        return backend.random.multivariate_normal(
+            mean=backend.zeros(dim_state), cov=backend.asarray(Q), size=size
+        )
 
 
-def observation_noise(t: float, size=1, backend_type: str = "numpy") -> np.ndarray:
+def observation_noise(
+    t: float, size: int = 1, backend_type: str = "numpy"
+) -> np.ndarray:
     backend = np if backend_type == "numpy" else cp
-    noise = backend.random.multivariate_normal(
-        mean=backend.zeros(dim_observation), cov=backend.asarray(R), size=size
-    )
-    return noise
+
+    if size == 1:
+        return backend.random.multivariate_normal(
+            mean=backend.zeros(dim_observation), cov=backend.asarray(R)
+        )
+    else:
+        return backend.random.multivariate_normal(
+            mean=backend.zeros(dim_observation), cov=backend.asarray(R), size=size
+        )

@@ -16,8 +16,8 @@ def generate_one(idx: int) -> None:
     system = model.RobotSystem(dt=dt_sim, t_max=T_MAX)
     system.simulate()
     traj_filename = os.path.join("data", "traj", f"{idx}.npy")
-    meas_filename = os.path.join("data", "obs", f"{idx}.npy")
-    system.save(traj_filename, meas_filename)
+    obs_filename = os.path.join("data", "obs", f"{idx}.npy")
+    system.save(traj_filename, obs_filename)
 
 
 def generate_all(parallel: bool = ENABLE_PARALLEL) -> None:

@@ -11,7 +11,7 @@ from dgsp.functions import (
 
 class RobotSystem:
     trajectory: list[np.ndarray]
-    measurements: list[np.ndarray]
+    observations: list[np.ndarray]
     time: float
     dt: float
     t_max: float
@@ -20,7 +20,7 @@ class RobotSystem:
     def __init__(self, dt: float, t_max: float) -> None:
         self.trajectory = [initial]
         self.time = 0.0
-        self.measurements = [
+        self.observations = [
             observation_cpu(
                 self.trajectory[0], np.zeros_like(self.trajectory[0]), self.time
             )
@@ -35,11 +35,11 @@ class RobotSystem:
             + transition_cpu(old_state, np.zeros_like(old_state), self.time) * self.dt
             + transition_noise(self.time)
         )
-        new_measurement = observation_cpu(
+        new_observation = observation_cpu(
             new_state, np.zeros_like(new_state), self.time
         ) + observation_noise(self.time)
         self.trajectory.append(new_state)
-        self.measurements.append(new_measurement)
+        self.observations.append(new_observation)
         self.time += self.dt
 
     def simulate(self) -> None:
@@ -47,6 +47,6 @@ class RobotSystem:
         for _ in range(n):
             self.step()
 
-    def save(self, traj_filename: str, meas_filename: str) -> None:
+    def save(self, traj_filename: str, obs_filename: str) -> None:
         np.save(traj_filename, self.trajectory)
-        np.save(meas_filename, self.measurements)
+        np.save(obs_filename, self.observations)
