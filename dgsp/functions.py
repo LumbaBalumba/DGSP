@@ -40,7 +40,6 @@ initial_guess = initial
 ###########################################################################
 
 sp_transition = sp.Matrix(transition(x))
-
 sp_transition_j = sp_transition.jacobian([x[i] for i in range(dim_state)])
 
 sp_observation = sp.Matrix(observation(x))

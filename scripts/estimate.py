@@ -49,13 +49,13 @@ def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
     if not os.path.exists(new_path_traj):
         os.makedirs(new_path_traj)
     if estimator.backend_type == "cupy":
-        traj_est = cp.asnumpy(traj_est)
+        traj_est = np.array(cp.asarray(traj_est).get())
     np.save(os.path.join(new_path_traj, f"{traj_n}.npy"), traj_est)
 
     if not os.path.exists(new_path_k):
         os.makedirs(new_path_k)
     if estimator.backend_type == "cupy":
-        k_est = cp.asnumpy(k_est)
+        k_est = np.array(cp.asarray(k_est).get())
     np.save(os.path.join(new_path_k, f"{traj_n}.npy"), k_est)
 
 
