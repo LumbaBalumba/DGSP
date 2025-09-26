@@ -1,6 +1,8 @@
 import os
 
 from joblib import Parallel, delayed
+from tqdm import tqdm
+from tqdm_joblib import tqdm_joblib
 
 import dgsp.model as model
 from scripts import ENABLE_PARALLEL, dt_sim, T_MAX, NUM_TRAJECTORIES
@@ -22,8 +24,9 @@ def generate_one(idx: int) -> None:
 
 def generate_all(parallel: bool = ENABLE_PARALLEL) -> None:
     if parallel:
-        Parallel(n_jobs=-1, verbose=10)(
-            delayed(generate_one)(i) for i in range(NUM_TRAJECTORIES)
-        )
+        with tqdm_joblib(desc="Generation", total=NUM_TRAJECTORIES):
+            Parallel(n_jobs=-1)(
+                delayed(generate_one)(i) for i in range(NUM_TRAJECTORIES)
+            )
     else:
-        [generate_one(i) for i in range(NUM_TRAJECTORIES)]
+        [generate_one(i) for i in tqdm(range(NUM_TRAJECTORIES))]

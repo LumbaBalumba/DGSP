@@ -4,6 +4,8 @@ from copy import deepcopy
 from joblib import Parallel, delayed
 import numpy as np
 import cupy as cp
+from tqdm import tqdm
+from tqdm_joblib import tqdm_joblib
 
 from dgsp.estimators import (
     Estimator,
@@ -95,12 +97,13 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
             raise RuntimeError(f"Invalid estimator type: {estimator_type}")
 
     if parallel:
-        Parallel(n_jobs=-1, verbose=10)(
-            delayed(estimate_one)(idx, deepcopy(estimator), estimator_type)
-            for idx in range(NUM_TRAJECTORIES)
-        )
+        with tqdm_joblib(desc=estimator_type, total=NUM_TRAJECTORIES):
+            Parallel(n_jobs=-1)(
+                delayed(estimate_one)(idx, deepcopy(estimator), estimator_type)
+                for idx in range(NUM_TRAJECTORIES)
+            )
     else:
-        for idx in range(NUM_TRAJECTORIES):
+        for idx in tqdm(range(NUM_TRAJECTORIES)):
             estimate_one(idx, deepcopy(estimator), estimator_type)
 
 
