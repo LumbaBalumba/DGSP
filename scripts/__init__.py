@@ -3,7 +3,7 @@ dt_sim = 1e-3
 dt_pred = dt_sim
 dt_obs = dt_pred * 10
 
-NUM_TRAJECTORIES = 100
+NUM_TRAJECTORIES = 10000
 
 ESTIMATORS = [
     # "ekf",
