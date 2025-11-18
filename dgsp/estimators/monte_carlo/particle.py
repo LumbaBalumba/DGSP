@@ -43,7 +43,7 @@ class ParticleFilter(MonteCarloFilter):
         self.weights.fill(1.0 / self.n_particles)
 
     @override
-    def update(self, data: np.ndarray) -> None:
+    def update(self, data: np.ndarray, *args, **kwargs) -> None:
         backend = np if self.backend_type == "numpy" else cp
 
         observations_est = self.observation(self.particles, batched=True)

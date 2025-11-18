@@ -57,10 +57,10 @@ class Estimator:
             observation_cpu_j if self.backend_type == "numpy" else observation_gpu_j
         )
 
-    def predict(self) -> None:
+    def predict(self, *args, **kwargs) -> None:
         self.time += self.dt
 
-    def update(self, data: np.ndarray) -> None:
+    def update(self, data: np.ndarray, *args, **kwargs) -> None:
         pass
 
     def transition_noise(self, size: int = 1) -> np.ndarray:

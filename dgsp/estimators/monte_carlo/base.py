@@ -21,7 +21,7 @@ class MonteCarloFilter(Estimator):
         self.weights = backend.ones(self.n_particles) / n_particles
 
     @override
-    def predict(self) -> None:
+    def predict(self, *args, **kwargs) -> None:
         backend = np if self.backend_type == "numpy" else cp
 
         self.particles = self.transition(self.particles, batched=True)

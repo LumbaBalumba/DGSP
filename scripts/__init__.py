@@ -3,7 +3,7 @@ dt_sim = 1e-3
 dt_pred = dt_sim
 dt_obs = dt_pred * 10
 
-NUM_TRAJECTORIES = 10000
+NUM_TRAJECTORIES = 1
 
 ESTIMATORS = [
     "ekf",
@@ -14,10 +14,10 @@ ESTIMATORS = [
     # "ckfr",
     "ukf",
     # "ukfr",
-    "pf",
+    # "pf",
     # "pfb",
     # "cmnf",
-    "trivial",
+    # "trivial",
 ]
 MONTE_CARLO_BACKEND = "numpy"  # "numpy" or "cupy"
 MONTE_CARLO_NUM_PARTICLES = 1000
