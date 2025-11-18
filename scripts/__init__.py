@@ -6,9 +6,11 @@ dt_obs = dt_pred * 10
 NUM_TRAJECTORIES = 10000
 
 ESTIMATORS = [
-    # "ekf",
+    "ekf",
     # "ekfr",
-    # "ckf",
+    # "ekf2",
+    # "ekf2r",
+    "ckf",
     # "ckfr",
     "ukf",
     # "ukfr",

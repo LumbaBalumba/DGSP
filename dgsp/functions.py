@@ -44,36 +44,41 @@ initial_guess = initial
 sp_transition = sp.Matrix(transition(x)) + sp.Matrix(
     [placeholder[i] for i in range(dim_state)]
 )
-sp_transition_j = sp_transition.jacobian(
-    [x[i] for i in range(dim_state)] + [placeholder[i] for i in range(dim_state)]
-)
+sp_transition_j = sp_transition.jacobian([x[i] for i in range(dim_state)])
 
 sp_observation = sp.Matrix(observation(x)) + sp.Matrix(
     [placeholder[i] for i in range(dim_observation)]
 )
-sp_observation_j = sp_observation.jacobian(
-    [x[i] for i in range(dim_state)] + [placeholder[i] for i in range(dim_observation)]
-)
+sp_observation_j = sp_observation.jacobian([x[i] for i in range(dim_state)])
 
 
-def prettify(func, backend_type="numpy"):
+def prettify(func, backend_type="numpy", flatten=True):
     F_raw = sp.lambdify((x, placeholder, t), func, backend_type)
 
     backend = np if backend_type == "numpy" else cp
-    return lambda x, t: F_raw(x, backend.zeros_like(x), t).reshape(-1)
+
+    def obj(x, t):
+        res = F_raw(x, backend.zeros_like(x), t)
+
+        if flatten:
+            res = res.reshape(-1)
+
+        return res
+
+    return obj
 
 
 transition_cpu = prettify(sp_transition)
-transition_cpu_j = prettify(sp_transition_j)
+transition_cpu_j = prettify(sp_transition_j, flatten=False)
 
 transition_gpu = prettify(sp_transition, "cupy")
-transition_gpu_j = prettify(sp_transition_j, "cupy")
+transition_gpu_j = prettify(sp_transition_j, "cupy", flatten=False)
 
 observation_cpu = prettify(sp_observation)
-observation_cpu_j = prettify(sp_observation_j)
+observation_cpu_j = prettify(sp_observation_j, flatten=False)
 
 observation_gpu = prettify(sp_observation, "cupy")
-observation_gpu_j = prettify(sp_observation_j, "cupy")
+observation_gpu_j = prettify(sp_observation_j, "cupy", flatten=False)
 
 
 def transition_noise(

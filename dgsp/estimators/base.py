@@ -12,6 +12,10 @@ from dgsp.functions import (
     observation_cpu,
     transition_gpu,
     observation_gpu,
+    transition_cpu_j,
+    observation_cpu_j,
+    transition_gpu_j,
+    observation_gpu_j,
     dim_state,
     dim_observation,
 )
@@ -42,8 +46,15 @@ class Estimator:
         self.transition_func = (
             transition_cpu if self.backend_type == "numpy" else transition_gpu
         )
+        self.transition_func_j = (
+            transition_cpu_j if self.backend_type == "numpy" else transition_gpu_j
+        )
+
         self.observation_func = (
             observation_cpu if self.backend_type == "numpy" else observation_gpu
+        )
+        self.observation_func_j = (
+            observation_cpu_j if self.backend_type == "numpy" else observation_gpu_j
         )
 
     def predict(self) -> None:
@@ -61,8 +72,8 @@ class Estimator:
     def transition(
         self,
         x: np.ndarray,
-        batched: bool = False,
         dt: float | None = None,
+        batched: bool = False,
     ) -> np.ndarray:
         if dt is None:
             dt = self.dt
@@ -76,6 +87,13 @@ class Estimator:
             dxdt = self.transition_func(x, self.time)
         return dxdt * dt + x
 
+    def transition_j(
+        self,
+        x: np.ndarray,
+    ):
+        dxdt = self.transition_func_j(x, self.time)
+        return dxdt
+
     def observation(self, x: np.ndarray, batched: bool = False) -> np.ndarray:
         if batched:
             y = (
@@ -85,4 +103,11 @@ class Estimator:
             )
         else:
             y = self.observation_func(x, self.time)
+        return y
+
+    def observation_j(
+        self,
+        x: np.ndarray,
+    ):
+        y = self.observation_func_j(x, self.time)
         return y

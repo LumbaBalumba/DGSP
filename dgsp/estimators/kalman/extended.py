@@ -1,40 +1,40 @@
+from typing_extensions import override
 import numpy as np
-from numpy.linalg import inv
+from filterpy.kalman import ExtendedKalmanFilter as EKF
 
 from dgsp.functions import (
-    transition_cpu,
-    transition_cpu_j,
-    observation_cpu,
-    observation_cpu_j,
+    dim_state,
+    dim_observation,
 )
 from dgsp.estimators.base import Estimator
 
 
 class ExtendedKalmanFilter(Estimator):
+    kf: EKF
 
     def __init__(self, order: int = 1, square_root: bool = False) -> None:
         super().__init__()
-        self.x = self.state[-1].copy()
+        self.kf = EKF(dim_x=dim_state, dim_z=dim_observation)
+        self.kf.x = self.state[0]
+        self.kf.P = self.P
+        self.kf.Q = self.Q
+        self.kf.R = self.R
 
+    @override
     def predict(self) -> None:
-        F = transition_cpu_j(self.x, self.time)
-        self.x = self.x + transition_cpu(self.x, self.time) * self.dt
+        self.kf.F = self.transition_j(self.kf.x) * self.dt + np.eye(dim_state)
+        self.kf.predict()
 
-        self.P = F @ self.P @ F.T + self.Q
-        self.state.append(self.x.copy())
-        self.k.append(self.P.copy())
-        super().predict()
+        self.state.append(self.kf.x)
+        self.k.append(self.kf.P)
 
+        return super().predict()
+
+    @override
     def update(self, data: np.ndarray) -> None:
-        H = observation_cpu_j(self.x, self.time)
-        S = H @ self.P @ H.T + self.R
-        K = self.P @ H.T @ inv(S)
+        self.kf.update(data, self.observation_j, self.observation)
 
-        y = data - observation_cpu(self.x, self.time)
-        self.x += K @ y
-        self.P = (np.eye(len(self.x)) - K @ H) @ self.P
-
-        self.state[-1] = self.x.copy()
-        self.k[-1] = self.P.copy()
+        self.state[-1] = self.kf.x
+        self.k[-1] = self.kf.P
 
         super().update(data)

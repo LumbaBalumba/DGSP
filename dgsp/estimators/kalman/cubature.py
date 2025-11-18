@@ -32,8 +32,8 @@ class CubatureKalmanFilter(Estimator):
     def predict(self) -> None:
         self.kf.predict()
 
-        self.state.append(self.kf.x.copy())
-        self.k.append(self.kf.P.copy())
+        self.state.append(self.kf.x)
+        self.k.append(self.kf.P)
 
         return super().predict()
 
@@ -41,7 +41,7 @@ class CubatureKalmanFilter(Estimator):
     def update(self, data: np.ndarray) -> None:
         self.kf.update(data)
 
-        self.state[-1] = self.kf.x.copy()
+        self.state[-1] = self.kf.x
         self.k[-1] = self.kf.P.copy()
 
         return super().update(data)
