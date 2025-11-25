@@ -1,20 +1,20 @@
-T_MAX = 1e0
+T_MAX = 1e1
 dt_sim = 1e-3
-dt_pred = dt_sim
+dt_pred = dt_sim * 10
 dt_obs = dt_pred * 10
 
 NUM_TRAJECTORIES = 1
 
 ESTIMATORS = [
-    "ekf",
+    # "ekf",
     # "ekfr",
     # "ekf2",
     # "ekf2r",
-    "ckf",
+    # "ckf",
     # "ckfr",
     "ukf",
     # "ukfr",
-    # "pf",
+    "pf",
     # "pfb",
     # "cmnf",
     # "trivial",

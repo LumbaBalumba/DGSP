@@ -20,4 +20,18 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
 
     @override
     def update(self, data: np.ndarray, *args, **kwargs) -> None:
-        super().update(data, self.observation_j, self.observation, *args, **kwargs)
+        def residual(a, b):
+            y = a - b
+            y[1] = y[1] % (2 * np.pi)  # force in range [0, 2 pi)
+            if y[1] > np.pi:  # move to [-pi, pi)
+                y[1] -= 2 * np.pi
+            return y
+
+        super().update(
+            data,
+            self.observation_j,
+            self.observation,
+            residual=residual,
+            *args,
+            **kwargs,
+        )

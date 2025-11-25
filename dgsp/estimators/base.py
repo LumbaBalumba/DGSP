@@ -19,7 +19,7 @@ from dgsp.functions import (
     dim_state,
     dim_observation,
 )
-from scripts import dt_sim, dt_pred
+from scripts import dt_pred
 
 
 class Estimator:
@@ -37,9 +37,9 @@ class Estimator:
         backend = np if self.backend_type == "numpy" else cp
 
         self.dt = dt_pred
-        self.Q = backend.asarray(Q) * (self.dt / dt_sim)
-        self.R = backend.asarray(R) * (self.dt / dt_sim)
-        self.P = backend.asarray(P)
+        self.Q = backend.asarray(Q) * self.dt
+        self.R = backend.asarray(R) * self.dt
+        self.P = backend.asarray(P) * self.dt
         self.state = [backend.asarray(initial_guess)]
         self.k = [self.P]
         self.time = 0.0
@@ -64,10 +64,10 @@ class Estimator:
         pass
 
     def transition_noise(self, size: int = 1) -> np.ndarray:
-        return transition_noise(self.time, size, self.backend_type) * dt_pred / dt_sim
+        return transition_noise(self.time, size, self.backend_type, dt=self.dt)
 
     def observation_noise(self, size: int = 1) -> np.ndarray:
-        return observation_noise(self.time, size, self.backend_type) * dt_pred / dt_sim
+        return observation_noise(self.time, size, self.backend_type, dt=self.dt)
 
     def transition(
         self,

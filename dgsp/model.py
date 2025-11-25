@@ -29,10 +29,10 @@ class RobotSystem:
         new_state = (
             old_state
             + transition_cpu(old_state, self.time) * self.dt
-            + transition_noise(self.time)
+            + transition_noise(self.time, dt=self.dt)
         )
         new_observation = observation_cpu(new_state, self.time) + observation_noise(
-            self.time
+            self.time, dt=self.dt
         )
         self.trajectory.append(new_state)
         self.observations.append(new_observation)

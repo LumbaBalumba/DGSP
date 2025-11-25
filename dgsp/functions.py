@@ -82,30 +82,34 @@ observation_gpu_j = prettify(sp_observation_j, "cupy", flatten=False)
 
 
 def transition_noise(
-    t: float, size: int = 1, backend_type: str = "numpy"
+    t: float, size: int = 1, backend_type: str = "numpy", dt: float = 1
 ) -> np.ndarray:
     backend = np if backend_type == "numpy" else cp
 
     if size == 1:
         return backend.random.multivariate_normal(
-            mean=backend.zeros(dim_state), cov=backend.asarray(Q)
+            mean=backend.zeros(dim_state), cov=backend.asarray(Q * np.sqrt(dt))
         )
     else:
         return backend.random.multivariate_normal(
-            mean=backend.zeros(dim_state), cov=backend.asarray(Q), size=size
+            mean=backend.zeros(dim_state),
+            cov=backend.asarray(Q * np.sqrt(dt)),
+            size=size,
         )
 
 
 def observation_noise(
-    t: float, size: int = 1, backend_type: str = "numpy"
+    t: float, size: int = 1, backend_type: str = "numpy", dt: float = 1
 ) -> np.ndarray:
     backend = np if backend_type == "numpy" else cp
 
     if size == 1:
         return backend.random.multivariate_normal(
-            mean=backend.zeros(dim_observation), cov=backend.asarray(R)
+            mean=backend.zeros(dim_observation), cov=backend.asarray(R * np.sqrt(dt))
         )
     else:
         return backend.random.multivariate_normal(
-            mean=backend.zeros(dim_observation), cov=backend.asarray(R), size=size
+            mean=backend.zeros(dim_observation),
+            cov=backend.asarray(R * np.sqrt(dt)),
+            size=size,
         )
