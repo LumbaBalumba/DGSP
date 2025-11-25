@@ -14,14 +14,14 @@ t = sp.Symbol("t")
 dim_state = 4
 dim_observation = 2
 
-Q = np.diag(np.array([3e-3, 3e-3, 3e-1, 3e-1])) / 1e4
-P = np.diag([3e-1, 3e-1, 3e-1, 3e-1]) / 1e6
+Q = np.diag(np.array([3e-3, 3e-3, 3e-1, 3e-1])) / 1e3
+P = np.diag([3e-1, 3e-1, 3e-1, 3e-1]) / 1e4
 R = np.eye(2) / 1e3 * 5
 
 L = 0.1
 
 u1 = 3.0
-u2 = 0.0
+u2 = 3.0
 
 
 def transition(x):
@@ -105,11 +105,11 @@ def observation_noise(
 
     if size == 1:
         return backend.random.multivariate_normal(
-            mean=backend.zeros(dim_observation), cov=backend.asarray(R * np.sqrt(dt))
+            mean=backend.zeros(dim_observation), cov=backend.asarray(R * dt)
         )
     else:
         return backend.random.multivariate_normal(
             mean=backend.zeros(dim_observation),
-            cov=backend.asarray(R * np.sqrt(dt)),
+            cov=backend.asarray(R * dt),
             size=size,
         )
