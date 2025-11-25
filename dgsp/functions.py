@@ -14,8 +14,8 @@ t = sp.Symbol("t")
 dim_state = 4
 dim_observation = 2
 
-Q = np.diag(np.array([3e-3, 3e-3, 3e-1, 3e-1])) / 1e3
-P = np.diag([3e-1, 3e-1, 3e-1, 3e-1]) / 1e4
+Q = np.diag(np.array([3e-3, 3e-3, 3e-1, 3e-1])) / 1e2
+P = np.diag([3e-3, 3e-3, 3e-1, 3e-1]) / 1e2
 R = np.eye(2) / 1e3 * 5
 
 L = 0.1
