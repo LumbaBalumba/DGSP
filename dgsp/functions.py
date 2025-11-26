@@ -14,9 +14,9 @@ t = sp.Symbol("t")
 dim_state = 4
 dim_observation = 2
 
-Q = np.diag(np.array([3e-3, 3e-3, 3e-1, 3e-1])) / 1e2
-P = np.diag([3e-3, 3e-3, 3e-1, 3e-1]) / 1e2
-R = np.eye(2) / 1e3 * 5
+Q = np.diag(np.array([3e-3, 3e-3, 3e-1, 3e-1]))
+P = np.diag([3e-3, 3e-3, 3e-1, 3e-1])
+R = np.eye(2) / 1e2 * 5
 
 L = 0.1
 
@@ -88,12 +88,12 @@ def transition_noise(
 
     if size == 1:
         return backend.random.multivariate_normal(
-            mean=backend.zeros(dim_state), cov=backend.asarray(Q * np.sqrt(dt))
+            mean=backend.zeros(dim_state), cov=backend.asarray(Q * dt)
         )
     else:
         return backend.random.multivariate_normal(
             mean=backend.zeros(dim_state),
-            cov=backend.asarray(Q * np.sqrt(dt)),
+            cov=backend.asarray(Q * dt),
             size=size,
         )
 
