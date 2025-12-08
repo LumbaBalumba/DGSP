@@ -98,7 +98,7 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
 
     if parallel:
         with tqdm_joblib(desc=estimator_type, total=NUM_TRAJECTORIES):
-            Parallel(n_jobs=-1)(
+            Parallel(n_jobs=-1, batch_size=100)(
                 delayed(estimate_one)(idx, deepcopy(estimator), estimator_type)
                 for idx in range(NUM_TRAJECTORIES)
             )

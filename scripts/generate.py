@@ -25,7 +25,7 @@ def generate_one(idx: int) -> None:
 def generate_all(parallel: bool = ENABLE_PARALLEL) -> None:
     if parallel:
         with tqdm_joblib(desc="Generation", total=NUM_TRAJECTORIES):
-            Parallel(n_jobs=-1)(
+            Parallel(n_jobs=-1, batch_size=100)(
                 delayed(generate_one)(i) for i in range(NUM_TRAJECTORIES)
             )
     else:
