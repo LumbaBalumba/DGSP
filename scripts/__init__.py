@@ -22,4 +22,7 @@ ESTIMATORS = [
 MONTE_CARLO_BACKEND = "numpy"  # "numpy" or "cupy"
 MONTE_CARLO_NUM_PARTICLES = 1000
 
+CONVERGENCE_COMPONENTS_CHECK = [0, 1]  # 'all' or list of state components
+CONVERGENCE_RATIO = 0.9
+
 ENABLE_PARALLEL = True
