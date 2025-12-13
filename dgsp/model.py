@@ -6,6 +6,7 @@ from dgsp.functions import (
     observation_cpu,
     observation_noise,
     initial,
+    Q,
 )
 
 
@@ -18,11 +19,14 @@ class RobotSystem:
     init: np.ndarray = np.array(initial, dtype=float)
 
     def __init__(self, dt: float, t_max: float) -> None:
-        self.trajectory = [initial]
-        self.time = 0.0
-        self.observations = [observation_cpu(self.trajectory[0], self.time)]
         self.dt = dt
         self.t_max = t_max
+        self.trajectory = [np.random.multivariate_normal(initial, Q * self.dt)]
+        self.time = 0.0
+        self.observations = [
+            observation_cpu(self.trajectory[0], self.time)
+            + observation_noise(self.time, dt=self.dt)
+        ]
 
     def step(self) -> None:
         old_state = self.trajectory[-1]
