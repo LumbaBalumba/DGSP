@@ -5,7 +5,7 @@ from tqdm import tqdm
 from tqdm_joblib import tqdm_joblib
 
 import dgsp.model as model
-from scripts import ENABLE_PARALLEL, dt_sim, T_MAX, NUM_TRAJECTORIES
+from scripts import dt_sim, T_MAX, NUM_TRAJECTORIES, PARALLEL_N_JOBS
 
 
 def generate_one(idx: int) -> None:
@@ -22,10 +22,10 @@ def generate_one(idx: int) -> None:
     system.save(traj_filename, obs_filename)
 
 
-def generate_all(parallel: bool = ENABLE_PARALLEL) -> None:
+def generate_all(parallel: int = PARALLEL_N_JOBS) -> None:
     if parallel:
         with tqdm_joblib(desc="Generation", total=NUM_TRAJECTORIES):
-            Parallel(n_jobs=-1, batch_size=100)(
+            Parallel(n_jobs=-1)(
                 delayed(generate_one)(i) for i in range(NUM_TRAJECTORIES)
             )
     else:

@@ -3,18 +3,18 @@ dt_sim = 1e-4
 dt_pred = dt_sim * 10
 dt_obs = dt_pred * 10
 
-NUM_TRAJECTORIES = 100
+NUM_TRAJECTORIES = 10000
 
 ESTIMATORS = [
     "ekf",
     # "ekfr",
     "ekf2",
     # "ekf2r",
-    # "ckf",
+    "ckf",
     # "ckfr",
-    # "ukf",
+    "ukf",
     # "ukfr",
-    # "pf",
+    "pf",
     # "pfb",
     # "cmnf",
     # "trivial",
@@ -25,4 +25,5 @@ MONTE_CARLO_NUM_PARTICLES = 1000
 CONVERGENCE_COMPONENTS_CHECK = [0, 1]  # 'all' or list of state components
 CONVERGENCE_RATIO = 0.9
 
-ENABLE_PARALLEL = True
+PARALLEL_N_JOBS = -1
+PARALLEL_BATCH_SIZE = 100
