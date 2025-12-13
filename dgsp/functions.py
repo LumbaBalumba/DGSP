@@ -45,11 +45,23 @@ sp_transition = sp.Matrix(transition(x)) + sp.Matrix(
     [placeholder[i] for i in range(dim_state)]
 )
 sp_transition_j = sp_transition.jacobian([x[i] for i in range(dim_state)])
+sp_transition_h = sp.Array(
+    [
+        sp.Array(sp.hessian(sp_transition[i], [x[i] for i in range(dim_state)]))
+        for i in range(dim_state)
+    ]
+)
 
 sp_observation = sp.Matrix(observation(x)) + sp.Matrix(
     [placeholder[i] for i in range(dim_observation)]
 )
 sp_observation_j = sp_observation.jacobian([x[i] for i in range(dim_state)])
+sp_observation_h = sp.Array(
+    [
+        sp.Array(sp.hessian(sp_observation[i], [x[i] for i in range(dim_state)]))
+        for i in range(dim_observation)
+    ]
+)
 
 
 def prettify(func, backend_type="numpy", flatten=True):
@@ -70,15 +82,19 @@ def prettify(func, backend_type="numpy", flatten=True):
 
 transition_cpu = prettify(sp_transition)
 transition_cpu_j = prettify(sp_transition_j, flatten=False)
+transition_cpu_h = prettify(sp_transition_h, flatten=False)
 
 transition_gpu = prettify(sp_transition, "cupy")
 transition_gpu_j = prettify(sp_transition_j, "cupy", flatten=False)
+transition_gpu_h = prettify(sp_transition_h, "cupy", flatten=False)
 
 observation_cpu = prettify(sp_observation)
 observation_cpu_j = prettify(sp_observation_j, flatten=False)
+observation_cpu_h = prettify(sp_observation_h, flatten=False)
 
 observation_gpu = prettify(sp_observation, "cupy")
 observation_gpu_j = prettify(sp_observation_j, "cupy", flatten=False)
+observation_gpu_h = prettify(sp_observation_h, "cupy", flatten=False)
 
 
 def transition_noise(
