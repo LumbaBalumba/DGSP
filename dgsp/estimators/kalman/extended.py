@@ -1,40 +1,42 @@
+from typing_extensions import override
 import numpy as np
-from numpy.linalg import inv
+from filterpy.kalman import ExtendedKalmanFilter as EKF
 
+from dgsp.estimators.kalman.base import BaseKalmanFilter
 from dgsp.functions import (
-    transition_cpu,
-    transition_cpu_j,
-    observation_cpu,
-    observation_cpu_j,
+    dim_state,
+    dim_observation,
 )
-from dgsp.estimators.base import Estimator
 
 
-class ExtendedKalmanFilter(Estimator):
+class ExtendedKalmanFilter(BaseKalmanFilter):
+    order: int
 
     def __init__(self, order: int = 1, square_root: bool = False) -> None:
-        super().__init__()
-        self.x = self.state[-1].copy()
+        super().__init__(EKF, lambda: dict(dim_x=dim_state, dim_z=dim_observation))
+        self.order = order
 
-    def predict(self) -> None:
-        F = transition_cpu_j(self.x, self.time)
-        self.x = self.x + transition_cpu(self.x, self.time) * self.dt
+    @override
+    def predict(self, *args, **kwargs) -> None:
+        F = self.transition_j(self.kf.x) * self.dt + np.eye(dim_state)
+        if self.order == 2:
+            F += 0.5 * self.kf.x.T @ self.transition_h(self.kf.x) * self.dt**2
+        self.kf.F = F
+        return super().predict(*args, **kwargs)
 
-        self.P = F @ self.P @ F.T + self.Q
-        self.state.append(self.x.copy())
-        self.k.append(self.P.copy())
-        super().predict()
-
-    def update(self, data: np.ndarray) -> None:
-        H = observation_cpu_j(self.x, self.time)
-        S = H @ self.P @ H.T + self.R
-        K = self.P @ H.T @ inv(S)
-
-        y = data - observation_cpu(self.x, self.time)
-        self.x += K @ y
-        self.P = (np.eye(len(self.x)) - K @ H) @ self.P
-
-        self.state[-1] = self.x.copy()
-        self.k[-1] = self.P.copy()
-
-        super().update(data)
+    @override
+    def update(self, data: np.ndarray, *args, **kwargs) -> None:
+        match self.order:
+            case 1:
+                f = self.observation_j
+            case 2:
+                f = lambda x: self.observation_j(x) + 0.5 * x.T @ self.observation_h(x)
+            case _:
+                f = None
+        super().update(
+            data,
+            f,
+            self.observation,
+            *args,
+            **kwargs,
+        )

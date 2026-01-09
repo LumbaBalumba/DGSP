@@ -17,7 +17,6 @@ from dgsp.estimators import (
     MinMaxFilter,
 )
 from scripts import (
-    ENABLE_PARALLEL,
     ESTIMATORS,
     MONTE_CARLO_BACKEND,
     MONTE_CARLO_NUM_PARTICLES,
@@ -25,6 +24,8 @@ from scripts import (
     dt_obs,
     dt_sim,
     NUM_TRAJECTORIES,
+    PARALLEL_N_JOBS,
+    PARALLEL_BATCH_SIZE,
 )
 
 
@@ -61,7 +62,7 @@ def estimate_one(traj_n: int, estimator: Estimator, estimator_dir: str) -> None:
     np.save(os.path.join(new_path_k, f"{traj_n}.npy"), k_est)
 
 
-def estimate_all(estimator_type: str, parallel: bool = True) -> None:
+def estimate_all(estimator_type: str, parallel: int = PARALLEL_N_JOBS) -> None:
     match estimator_type:
         case "ekf":
             estimator = ExtendedKalmanFilter()
@@ -98,7 +99,7 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
 
     if parallel:
         with tqdm_joblib(desc=estimator_type, total=NUM_TRAJECTORIES):
-            Parallel(n_jobs=-1)(
+            Parallel(n_jobs=-1, batch_size=PARALLEL_BATCH_SIZE)(
                 delayed(estimate_one)(idx, deepcopy(estimator), estimator_type)
                 for idx in range(NUM_TRAJECTORIES)
             )
@@ -107,7 +108,7 @@ def estimate_all(estimator_type: str, parallel: bool = True) -> None:
             estimate_one(idx, deepcopy(estimator), estimator_type)
 
 
-def estimate(parallel: bool = ENABLE_PARALLEL) -> None:
+def estimate(parallel: int = PARALLEL_N_JOBS) -> None:
     for estimator_type in ESTIMATORS:
         print(f"Running {estimator_type} estimator")
         estimate_all(estimator_type, parallel)

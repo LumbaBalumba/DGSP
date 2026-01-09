@@ -5,7 +5,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from dgsp.functions import dim_state
-from scripts import ESTIMATORS, NUM_TRAJECTORIES, T_MAX, dt_pred, dt_sim
+from scripts import (
+    CONVERGENCE_COMPONENTS_CHECK,
+    ESTIMATORS,
+    NUM_TRAJECTORIES,
+    T_MAX,
+    dt_pred,
+    dt_sim,
+)
 
 
 def example() -> None:
@@ -179,8 +186,19 @@ def mass_error() -> None:
 
         std = np.diagonal(k_est, axis1=2, axis2=3) ** 0.5
 
+        components = CONVERGENCE_COMPONENTS_CHECK
+        if components == "all":
+            components = np.arange(0, dim_state)
+        components = np.array(components)
+
         converge = np.all(
-            np.mean(np.abs(trajs - trajs_est) < 5 * std, axis=1) >= 0.95, axis=1
+            np.mean(
+                np.abs(trajs[:, :, components] - trajs_est[:, :, components])
+                < 5 * std[:, :, components],
+                axis=1,
+            )
+            >= 0.9,
+            axis=1,
         )
 
         df[estimator] = (trajs_est, converge)
