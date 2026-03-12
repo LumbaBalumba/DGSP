@@ -3,6 +3,7 @@ from typing_extensions import override
 import numpy as np
 
 from dgsp.estimators.base import Estimator
+from scripts import dt_sim
 
 
 class TrivialEstimator(Estimator):
@@ -20,7 +21,7 @@ class TrivialEstimator(Estimator):
     @override
     def predict(self) -> None:
         try:
-            idx = int(np.ceil(self.time / self.dt))
+            idx = int(np.ceil(self.time / dt_sim))
             self.state.append(self.traj[idx, :])
             self.k.append(np.diag(self.var[idx, :]))
             super().predict()
